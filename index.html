@@ -43,6 +43,127 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 28px;
+    gap: 8px;
+  }
+
+  .music-ctrl-btn {
+    background: #25232a;
+    border: 1px solid #322f37;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+    color: #9B98A0;
+  }
+
+  .music-ctrl-btn:active {
+    background: #BF7FFF;
+    color: #0f0f13;
+    transform: scale(0.93);
+  }
+
+  /* Capa do álbum no header */
+  .album-cover {
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    background: #25232a;
+    border: 1px solid #322f37;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    overflow: hidden;
+    flex-shrink: 0;
+    margin: 0 auto 8px;
+    transition: all 0.3s ease;
+  }
+
+  .album-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 9px;
+  }
+
+  .album-cover.playing {
+    border-color: #BF7FFF;
+    box-shadow: 0 0 16px rgba(191,127,255,0.3);
+    animation: rodar 8s linear infinite;
+  }
+
+  @keyframes rodar {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  .music-info-center {
+    text-align: center;
+    flex: 1;
+  }
+
+  .music-track-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #F5F2EE;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
+    margin: 0 auto 2px;
+  }
+
+  .music-track-name.idle {
+    color: #6B6870;
+    font-weight: 400;
+    font-size: 12px;
+  }
+
+  .music-artist-name {
+    font-size: 11px;
+    color: #6B6870;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
+    margin: 0 auto 6px;
+  }
+
+  /* Mini barra de progresso no header */
+  .header-progress {
+    width: 140px;
+    margin: 0 auto 4px;
+  }
+
+  .header-progress-bar {
+    height: 3px;
+    background: #25232a;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 3px;
+    cursor: pointer;
+  }
+
+  .header-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #BF7FFF, #9B5FE0);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.5s linear;
+  }
+
+  .header-time-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: #6B6870;
+    font-family: monospace;
   }
 
   .car-name {
@@ -58,10 +179,6 @@
     font-weight: 700;
     color: #F5F2EE;
     letter-spacing: -0.02em;
-  }
-
-  .fuel-type {
-    text-align: right;
   }
 
   .fuel-label {
@@ -357,6 +474,133 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.5);
   }
 
+  /* Player de música */
+  .music-panel {
+    width: 100%;
+    max-width: 420px;
+    background: #1c1a1f;
+    border: 1px solid #322f37;
+    border-radius: 24px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .music-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .music-title-section {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .music-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #6B6870;
+    margin-bottom: 3px;
+  }
+
+  .music-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #F5F2EE;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .music-name.idle { color: #6B6870; font-weight: 400; font-size: 13px; }
+
+  .music-select-btn {
+    background: #25232a;
+    border: 1px solid #322f37;
+    border-radius: 10px;
+    color: #9B98A0;
+    font-size: 12px;
+    padding: 8px 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    margin-left: 12px;
+    transition: all 0.2s ease;
+  }
+
+  .music-select-btn:active { background: #322f37; }
+
+  /* Barra de progresso */
+  .music-progress-wrap {
+    margin-bottom: 10px;
+  }
+
+  .music-progress-bar {
+    height: 4px;
+    background: #25232a;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 4px;
+    cursor: pointer;
+  }
+
+  .music-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #BF7FFF, #9B5FE0);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.5s linear;
+  }
+
+  .music-time-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #6B6870;
+    font-family: monospace;
+  }
+
+  /* Controles */
+  .music-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .music-btn {
+    background: none;
+    border: none;
+    color: #9B98A0;
+    cursor: pointer;
+    font-size: 22px;
+    padding: 8px;
+    transition: all 0.15s ease;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .music-btn:active { background: #25232a; transform: scale(0.9); }
+
+  .music-btn.play-pause {
+    background: #BF7FFF;
+    color: #0f0f13;
+    width: 54px;
+    height: 54px;
+    font-size: 20px;
+    box-shadow: 0 4px 16px rgba(191,127,255,0.35);
+  }
+
+  .music-btn.play-pause:active { transform: scale(0.93); }
+
+  /* Arquivo de input escondido */
+  #music-file-input { display: none; }
+
   /* Alerta de reserva */
   .alerta-overlay {
     display: none;
@@ -456,17 +700,47 @@
 
   <!-- Header -->
   <div class="header">
-    <div>
-      <div class="car-name">Chevrolet</div>
-      <div class="car-model">Celta Spirit</div>
-    </div>
-    <div class="fuel-type">
-      <div class="fuel-label">Combustível</div>
-      <div class="fuel-toggle">
+    <!-- Anterior -->
+    <button class="music-ctrl-btn" onclick="musicaAnterior()" title="Anterior">⏮</button>
+
+    <!-- Centro -->
+    <div class="music-info-center">
+      <!-- Capa do álbum -->
+      <div class="album-cover" id="album-cover">🎵</div>
+
+      <!-- Nome da música -->
+      <div class="music-track-name idle" id="header-music-name">Celta Spirit</div>
+
+      <!-- Artista -->
+      <div class="music-artist-name" id="header-artist-name">Chevrolet · 2007</div>
+
+      <!-- Mini barra de progresso -->
+      <div class="header-progress">
+        <div class="header-progress-bar" onclick="seekMusica(event)" id="header-progress-bar">
+          <div class="header-progress-fill" id="header-progress-fill"></div>
+        </div>
+        <div class="header-time-row">
+          <span id="header-cur-time">0:00</span>
+          <span id="header-dur-time">0:00</span>
+        </div>
+      </div>
+
+      <!-- Pause/Play -->
+      <button id="header-play-btn" onclick="toggleMusica()" style="
+        background:none;border:none;font-size:24px;cursor:pointer;
+        padding:4px 16px;border-radius:20px;margin-top:4px;
+        color:#BF7FFF;transition:all 0.15s ease;display:inline-block;
+      ">▶</button>
+
+      <!-- GAS/ALC -->
+      <div class="fuel-toggle" style="justify-content:center;margin-top:6px;">
         <button class="fuel-btn active-gas" id="btn-gas" onclick="setFuel('gas')">GAS</button>
         <button class="fuel-btn" id="btn-alc" onclick="setFuel('alc')">ALC</button>
       </div>
     </div>
+
+    <!-- Próxima -->
+    <button class="music-ctrl-btn" onclick="proximaMusica()" title="Próxima">⏭</button>
   </div>
 
   <!-- Card do tanque -->
@@ -574,6 +848,35 @@
       <span>48L cheio</span>
     </div>
   </div>
+
+  <!-- Player de música -->
+  <div class="music-panel">
+    <div class="music-header">
+      <div class="music-title-section">
+        <div class="music-label">🎵 Música</div>
+        <div class="music-name idle" id="music-name">Selecione uma música</div>
+      </div>
+      <button class="music-select-btn" onclick="selecionarMusica()">📂 Abrir</button>
+    </div>
+
+    <div class="music-progress-wrap">
+      <div class="music-progress-bar" id="music-progress-bar" onclick="seekMusica(event)">
+        <div class="music-progress-fill" id="music-progress-fill"></div>
+      </div>
+      <div class="music-time-row">
+        <span id="music-cur-time">0:00</span>
+        <span id="music-dur-time">0:00</span>
+      </div>
+    </div>
+
+    <div class="music-controls">
+      <button class="music-btn" onclick="musicaAnterior()" title="Anterior">⏮</button>
+      <button class="music-btn play-pause" id="music-play-btn" onclick="toggleMusica()">▶</button>
+      <button class="music-btn" onclick="proximaMusica()" title="Próxima">⏭</button>
+    </div>
+  </div>
+
+  <input type="file" id="music-file-input" accept="audio/*" multiple onchange="carregarMusicas(event)">
 
   <!-- Overlay de alerta de reserva -->
   <div class="alerta-overlay" id="alerta-overlay">
@@ -923,6 +1226,237 @@
         : 'Nenhum abastecimento registrado ainda';
     }
   }
+
+  // ---- PLAYER DE MÚSICA ----
+  let audio = new Audio();
+  let playlist = [];
+  let musicaAtual = 0;
+  let tocando = false;
+
+  function selecionarMusica() {
+    document.getElementById('music-file-input').click();
+  }
+
+  function carregarMusicas(event) {
+    const files = Array.from(event.target.files);
+    if (!files.length) return;
+
+    playlist = files.map(f => ({
+      nome: f.name.replace(/\.[^.]+$/, ''),
+      artista: 'Desconhecido',
+      capa: null,
+      url: URL.createObjectURL(f),
+      file: f
+    }));
+
+    musicaAtual = 0;
+    lerMetadados(0);
+    mostrarToast('🎵 ' + playlist.length + ' música(s) carregada(s)!');
+  }
+
+  // Lê metadados ID3 básicos (título, artista, capa)
+  async function lerMetadados(index) {
+    const faixa = playlist[index];
+    if (!faixa) return;
+
+    try {
+      const buf = await faixa.file.arrayBuffer();
+      const bytes = new Uint8Array(buf);
+
+      // Verifica se tem tag ID3v2
+      if (bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] === 0x33) {
+        const tags = parseID3v2(bytes);
+        if (tags.titulo) faixa.nome    = tags.titulo;
+        if (tags.artista) faixa.artista = tags.artista;
+        if (tags.capa)    faixa.capa    = tags.capa;
+      }
+    } catch(e) {}
+
+    carregarFaixa(index);
+  }
+
+  function parseID3v2(bytes) {
+    const result = { titulo: null, artista: null, capa: null };
+    try {
+      // Tamanho do header ID3
+      const size = ((bytes[6] & 0x7F) << 21) | ((bytes[7] & 0x7F) << 14) |
+                   ((bytes[8] & 0x7F) << 7)  |  (bytes[9] & 0x7F);
+      let pos = 10;
+      const end = Math.min(pos + size, bytes.length);
+
+      while (pos < end - 10) {
+        const frameId = String.fromCharCode(bytes[pos], bytes[pos+1], bytes[pos+2], bytes[pos+3]);
+        const frameSize = (bytes[pos+4] << 24) | (bytes[pos+5] << 16) | (bytes[pos+6] << 8) | bytes[pos+7];
+        pos += 10;
+        if (frameSize <= 0 || pos + frameSize > end) break;
+
+        const frameData = bytes.slice(pos, pos + frameSize);
+
+        if (frameId === 'TIT2' && !result.titulo) {
+          result.titulo = decodeID3String(frameData);
+        } else if (frameId === 'TPE1' && !result.artista) {
+          result.artista = decodeID3String(frameData);
+        } else if (frameId === 'APIC' && !result.capa) {
+          // Pula encoding, mime type e description pra chegar nos bytes da imagem
+          let i = 1;
+          while (i < frameData.length && frameData[i] !== 0) i++;
+          i++; // pula null após mime
+          i++; // pula picture type
+          while (i < frameData.length && frameData[i] !== 0) i++;
+          i++; // pula null após description
+          if (i < frameData.length) {
+            const imgBytes = frameData.slice(i);
+            const blob = new Blob([imgBytes]);
+            result.capa = URL.createObjectURL(blob);
+          }
+        }
+        pos += frameSize;
+      }
+    } catch(e) {}
+    return result;
+  }
+
+  function decodeID3String(data) {
+    try {
+      const enc = data[0];
+      const str = data.slice(1);
+      if (enc === 1 || enc === 2) {
+        return new TextDecoder('utf-16').decode(str).replace(/\x00/g, '').trim();
+      }
+      return new TextDecoder('utf-8').decode(str).replace(/\x00/g, '').trim();
+    } catch(e) { return null; }
+  }
+
+  function carregarFaixa(index) {
+    if (!playlist.length) return;
+    const faixa = playlist[index];
+    audio.src = faixa.url;
+    audio.load();
+
+    // Atualiza nome no player de baixo
+    const nameEl = document.getElementById('music-name');
+    if (nameEl) { nameEl.textContent = faixa.nome; nameEl.classList.remove('idle'); }
+
+    // Atualiza nome no header
+    const hName = document.getElementById('header-music-name');
+    if (hName) { hName.textContent = faixa.nome; hName.classList.remove('idle'); }
+
+    // Atualiza artista no header
+    const hArtist = document.getElementById('header-artist-name');
+    if (hArtist) hArtist.textContent = faixa.artista || 'Artista desconhecido';
+
+    // Atualiza capa
+    const cover = document.getElementById('album-cover');
+    if (cover) {
+      if (faixa.capa) {
+        cover.innerHTML = '<img src="' + faixa.capa + '" alt="capa">';
+      } else {
+        cover.innerHTML = '🎵';
+      }
+    }
+
+    if (tocando) audio.play().catch(() => {});
+  }
+
+  function toggleMusica() {
+    if (!playlist.length) {
+      selecionarMusica(); return;
+    }
+    if (tocando) {
+      audio.pause();
+      tocando = false;
+      document.getElementById('music-play-btn').textContent = '▶';
+    } else {
+      audio.play().then(() => {
+        tocando = true;
+        document.getElementById('music-play-btn').textContent = '⏸';
+      }).catch(() => {
+        mostrarToast('Erro ao tocar — tente de novo', '#FF5544');
+      });
+    }
+  }
+
+  function proximaMusica() {
+    if (!playlist.length) return;
+    musicaAtual = (musicaAtual + 1) % playlist.length;
+    carregarFaixa(musicaAtual);
+    if (tocando) audio.play().catch(() => {});
+  }
+
+  function musicaAnterior() {
+    if (!playlist.length) return;
+    // Se passou mais de 3s volta pro início, senão vai pra anterior
+    if (audio.currentTime > 3) {
+      audio.currentTime = 0; return;
+    }
+    musicaAtual = (musicaAtual - 1 + playlist.length) % playlist.length;
+    carregarFaixa(musicaAtual);
+    if (tocando) audio.play().catch(() => {});
+  }
+
+  function seekMusica(event) {
+    if (!audio.duration) return;
+    const bar = document.getElementById('music-progress-bar');
+    const rect = bar.getBoundingClientRect();
+    const pct = (event.clientX - rect.left) / rect.width;
+    audio.currentTime = pct * audio.duration;
+  }
+
+  function formatarTempo(s) {
+    if (!isFinite(s) || s < 0) return '0:00';
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return m + ':' + String(sec).padStart(2, '0');
+  }
+
+  // Eventos do audio
+  audio.addEventListener('timeupdate', () => {
+    if (!audio.duration) return;
+    const pct = (audio.currentTime / audio.duration) * 100;
+
+    // Player de baixo
+    const fill = document.getElementById('music-progress-fill');
+    const cur  = document.getElementById('music-cur-time');
+    if (fill) fill.style.width = pct + '%';
+    if (cur)  cur.textContent  = formatarTempo(audio.currentTime);
+
+    // Header
+    const hFill = document.getElementById('header-progress-fill');
+    const hCur  = document.getElementById('header-cur-time');
+    if (hFill) hFill.style.width = pct + '%';
+    if (hCur)  hCur.textContent  = formatarTempo(audio.currentTime);
+  });
+
+  audio.addEventListener('loadedmetadata', () => {
+    const dur  = document.getElementById('music-dur-time');
+    const hDur = document.getElementById('header-dur-time');
+    if (dur)  dur.textContent  = formatarTempo(audio.duration);
+    if (hDur) hDur.textContent = formatarTempo(audio.duration);
+  });
+
+  audio.addEventListener('ended', () => {
+    proximaMusica();
+  });
+
+  audio.addEventListener('play',  () => {
+    tocando = true;
+    const pb = document.getElementById('music-play-btn');
+    const hb = document.getElementById('header-play-btn');
+    const cover = document.getElementById('album-cover');
+    if (pb) pb.textContent = '⏸';
+    if (hb) { hb.textContent = '⏸'; hb.style.color = '#BF7FFF'; }
+    if (cover) cover.classList.add('playing');
+  });
+
+  audio.addEventListener('pause', () => {
+    tocando = false;
+    const pb = document.getElementById('music-play-btn');
+    const hb = document.getElementById('header-play-btn');
+    const cover = document.getElementById('album-cover');
+    if (pb) pb.textContent = '▶';
+    if (hb) { hb.textContent = '▶'; hb.style.color = '#6B6870'; }
+    if (cover) cover.classList.remove('playing');
+  });
 
   // ---- FULLSCREEN ----
   function entrarTelaCheia() {
