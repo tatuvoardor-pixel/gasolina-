@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0f0f13">
+<title>Celta ⛽</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230f0f13'/><text y='70' x='50' text-anchor='middle' font-size='60'>⛽</text></svg>">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html {
+    height: 100%;
+    height: 100dvh;
+  }
+
+  body {
+    background: #0f0f13;
+    color: #F5F2EE;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    min-height: 100dvh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 40px;
+    user-select: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Header */
+  .header {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+  }
+
+  .car-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #9B98A0;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .car-model {
+    font-size: 20px;
+    font-weight: 700;
+    color: #F5F2EE;
+    letter-spacing: -0.02em;
+  }
+
+  .fuel-type {
+    text-align: right;
+  }
+
+  .fuel-label {
+    font-size: 11px;
+    color: #6B6870;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+
+  .fuel-toggle {
+    display: flex;
+    gap: 6px;
+  }
+
+  .fuel-btn {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1.5px solid #322f37;
+    background: #25232a;
+    color: #6B6870;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .fuel-btn.active-gas {
+    background: #FFB400;
+    border-color: #FFB400;
+    color: #0f0f13;
+  }
+
+  .fuel-btn.active-alc {
+    background: #00E593;
+    border-color: #00E593;
+    color: #0f0f13;
+  }
+
+  /* Indicador principal do tanque */
+  .tank-card {
+    width: 100%;
+    max-width: 420px;
+    background: #1c1a1f;
+    border-radius: 24px;
+    padding: 24px 20px 28px;
+    margin-bottom: 20px;
+    border: 1px solid #322f37;
+    position: relative;
+    overflow: visible;
+  }
+
+  /* Glow de fundo baseado na cor */
+  .tank-card::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--glow-color, rgba(43,214,143,0.15)) 0%, transparent 70%);
+    pointer-events: none;
+    transition: background 0.5s ease;
+  }
+
+  .tank-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #6B6870;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
+  /* Barra do tanque */
+  .tank-bar-wrap {
+    position: relative;
+    height: 28px;
+    background: #25232a;
+    border-radius: 14px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    border: 1px solid #322f37;
+  }
+
+  .tank-bar-fill {
+    height: 100%;
+    border-radius: 14px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background 0.5s ease;
+    position: relative;
+  }
+
+  .tank-bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 8px;
+    right: 8px;
+    height: 6px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 3px;
+  }
+
+  /* Marcador de reserva (10L) */
+  .tank-reserve-mark {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: rgba(255,85,68,0.6);
+    left: 20.83%; /* 10/48 = 20.83% */
+  }
+
+  .tank-reserve-mark::before {
+    content: '⚠';
+    position: absolute;
+    top: -20px;
+    left: -8px;
+    font-size: 12px;
+    color: #FF5544;
+  }
+
+  /* Marcador de metade */
+  .tank-half-mark {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: rgba(255,255,255,0.1);
+    left: 50%;
+  }
+
+  /* Porcentagem */
+  .tank-pct {
+    text-align: center;
+    font-size: 56px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    margin: 16px 0 8px;
+    transition: color 0.5s ease;
+    overflow: visible;
+  }
+
+  .tank-litros {
+    text-align: center;
+    font-size: 15px;
+    color: #9B98A0;
+    margin-bottom: 20px;
+  }
+
+  .tank-litros strong {
+    color: #F5F2EE;
+    font-weight: 600;
+  }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: #322f37;
+    margin: 0 -4px 20px;
+  }
+
+  /* KM restantes */
+  .km-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .km-item {
+    text-align: center;
+    flex: 1;
+  }
+
+  .km-item + .km-item {
+    border-left: 1px solid #322f37;
+  }
+
+  .km-item-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #6B6870;
+    margin-bottom: 4px;
+  }
+
+  .km-item-value {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    transition: color 0.5s ease;
+  }
+
+  .km-item-unit {
+    font-size: 11px;
+    color: #6B6870;
+    margin-top: 1px;
+  }
+
+  /* Status badge */
+  .status-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.5s ease;
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: blink 1.5s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* Cores do semáforo */
+  .verde {
+    --glow-color: rgba(43,214,143,0.15);
+    --cor: #2BD68F;
+  }
+  .amarelo {
+    --glow-color: rgba(255,180,0,0.15);
+    --cor: #FFB400;
+  }
+  .vermelho {
+    --glow-color: rgba(255,85,68,0.2);
+    --cor: #FF5544;
+  }
+
+  /* Botão Tanque Cheio */
+  .btn-tanque {
+    width: 100%;
+    max-width: 420px;
+    padding: 18px;
+    background: #2BD68F;
+    color: #0f0f13;
+    border: none;
+    border-radius: 16px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: -0.01em;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 8px 24px rgba(43,214,143,0.3);
+    margin-bottom: 12px;
+  }
+
+  .btn-tanque:active {
+    transform: scale(0.97);
+    box-shadow: 0 4px 12px rgba(43,214,143,0.2);
+  }
+
+  .btn-tanque .icon { font-size: 20px; }
+
+  /* Slider de teste (só pra parte 1) */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    background: #25232a;
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    background: #F5F2EE;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+
+  /* Alerta de reserva */
+  .alerta-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(255,85,68,0.15);
+    backdrop-filter: blur(2px);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    animation: piscaFundo 0.8s ease-in-out infinite;
+  }
+
+  .alerta-overlay.ativo { display: flex; }
+
+  @keyframes piscaFundo {
+    0%, 100% { background: rgba(255,85,68,0.08); }
+    50%       { background: rgba(255,85,68,0.25); }
+  }
+
+  .alerta-box {
+    background: #1c1a1f;
+    border: 2px solid #FF5544;
+    border-radius: 24px;
+    padding: 32px 28px;
+    text-align: center;
+    max-width: 320px;
+    width: 90%;
+    box-shadow: 0 0 40px rgba(255,85,68,0.4);
+    animation: piscaBorda 0.8s ease-in-out infinite;
+  }
+
+  @keyframes piscaBorda {
+    0%, 100% { border-color: #FF5544; box-shadow: 0 0 20px rgba(255,85,68,0.3); }
+    50%       { border-color: #ff8877; box-shadow: 0 0 50px rgba(255,85,68,0.6); }
+  }
+
+  .alerta-emoji {
+    font-size: 56px;
+    margin-bottom: 12px;
+    animation: balanco 0.5s ease-in-out infinite alternate;
+  }
+
+  @keyframes balanco {
+    from { transform: rotate(-10deg) scale(1.0); }
+    to   { transform: rotate(10deg)  scale(1.1); }
+  }
+
+  .alerta-titulo {
+    font-size: 24px;
+    font-weight: 800;
+    color: #FF5544;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+
+  .alerta-sub {
+    font-size: 14px;
+    color: #9B98A0;
+    line-height: 1.5;
+    margin-bottom: 20px;
+  }
+
+  .alerta-km {
+    font-size: 36px;
+    font-weight: 800;
+    color: #FF5544;
+    letter-spacing: -0.03em;
+    margin-bottom: 4px;
+  }
+
+  .alerta-km-label {
+    font-size: 12px;
+    color: #6B6870;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 24px;
+  }
+
+  .alerta-btn {
+    width: 100%;
+    padding: 14px;
+    background: #FF5544;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .alerta-btn:active { transform: scale(0.97); }
+</style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <div class="car-name">Chevrolet</div>
+      <div class="car-model">Celta Spirit</div>
+    </div>
+    <div class="fuel-type">
+      <div class="fuel-label">Combustível</div>
+      <div class="fuel-toggle">
+        <button class="fuel-btn active-gas" id="btn-gas" onclick="setFuel('gas')">GAS</button>
+        <button class="fuel-btn" id="btn-alc" onclick="setFuel('alc')">ALC</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card do tanque -->
+  <div class="tank-card verde" id="tank-card">
+    <div class="tank-label">Nível do tanque · 48 litros</div>
+
+    <!-- Barra -->
+    <div class="tank-bar-wrap">
+      <div class="tank-bar-fill" id="tank-fill"></div>
+      <div class="tank-reserve-mark"></div>
+      <div class="tank-half-mark"></div>
+    </div>
+
+    <!-- Marcadores -->
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:#6B6870;margin-bottom:16px;padding:0 2px;">
+      <span>0L</span>
+      <span style="margin-left:12%">⚠10L</span>
+      <span>24L</span>
+      <span>48L</span>
+    </div>
+
+    <!-- Percentual grande -->
+    <div class="tank-pct" id="tank-pct">100%</div>
+    <div class="tank-litros" id="tank-litros"><strong>48.0</strong> litros restantes</div>
+
+    <div class="divider"></div>
+
+    <!-- KM restantes -->
+    <div class="km-row">
+      <div class="km-item">
+        <div class="km-item-label">KM restantes</div>
+        <div class="km-item-value" id="km-rest">—</div>
+        <div class="km-item-unit">quilômetros</div>
+      </div>
+      <div class="km-item">
+        <div class="km-item-label">Consumo médio</div>
+        <div class="km-item-value" id="consumo-val">10.7</div>
+        <div class="km-item-unit">km/litro</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Badge de status -->
+  <div class="status-badge" id="status-badge">
+    <div class="status-dot" id="status-dot"></div>
+    <span id="status-text">Tanque cheio — bora dirigir! 🚗</span>
+  </div>
+
+  <!-- Botão tanque cheio -->
+  <button class="btn-tanque" id="btn-tanque" onclick="tanqueCheio()">
+    <span class="icon">⛽</span>
+    Tanque Cheio
+  </button>
+
+  <!-- KM rodados na viagem atual -->
+  <div style="width:100%;max-width:360px;display:flex;justify-content:space-between;
+    align-items:center;background:#1c1a1f;border:1px solid #322f37;border-radius:16px;
+    padding:14px 20px;margin-bottom:14px;">
+    <div>
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;
+        color:#6B6870;margin-bottom:4px;">KM rodados agora</div>
+      <div id="km-rodados-val" style="font-size:28px;font-weight:800;
+        color:#F5F2EE;letter-spacing:-0.02em;">0.0 km</div>
+    </div>
+    <div id="gps-status" style="font-size:11px;color:#6B6870;text-align:center;">
+      <div style="width:8px;height:8px;border-radius:50%;background:#6B6870;
+        margin:0 auto 4px;" id="gps-dot"></div>
+      GPS off
+    </div>
+  </div>
+
+  <!-- Botão iniciar/parar viagem -->
+  <button id="btn-viagem" onclick="toggleViagem()" style="
+    width:100%;max-width:360px;padding:18px;background:#BF7FFF;
+    color:#0f0f13;border:none;border-radius:16px;font-size:17px;font-weight:700;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
+    box-shadow:0 8px 24px rgba(191,127,255,0.35);margin-bottom:12px;
+    transition:all 0.2s ease;">
+    🚗 Iniciar viagem
+  </button>
+
+  <!-- Info abastecimento -->
+  <div id="ultimo-abast" style="width:100%;max-width:360px;text-align:center;
+    font-size:12px;color:#6B6870;margin-bottom:16px;padding:10px 16px;
+    background:#1c1a1f;border-radius:12px;border:1px solid #322f37;">
+    Nenhum abastecimento registrado ainda
+  </div>
+
+  <!-- Ajuste manual do nível -->
+  <div style="width:100%;max-width:360px;background:#1c1a1f;border:1px solid #322f37;
+    border-radius:16px;padding:16px 20px;margin-bottom:12px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <span style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#6B6870;">
+        Ajuste manual do tanque
+      </span>
+      <span id="slider-val" style="font-size:13px;font-weight:600;color:#F5F2EE;
+        font-family:monospace;"></span>
+    </div>
+    <input type="range" id="slider" min="0" max="48" value="48" step="0.5"
+           oninput="testarNivel(this.value)" style="width:100%;">
+    <div style="display:flex;justify-content:space-between;font-size:10px;
+      color:#6B6870;margin-top:6px;">
+      <span>0L vazio</span>
+      <span>⚠️ 10L reserva</span>
+      <span>48L cheio</span>
+    </div>
+  </div>
+
+  <!-- Overlay de alerta de reserva -->
+  <div class="alerta-overlay" id="alerta-overlay">
+    <div class="alerta-box">
+      <div class="alerta-emoji">⛽</div>
+      <div class="alerta-titulo">RESERVA!</div>
+      <div class="alerta-sub">Seu Celta está com menos de<br><strong style="color:#FF5544">10 litros</strong> — procure um posto!</div>
+      <div class="alerta-km" id="alerta-km-val">~100</div>
+      <div class="alerta-km-label">km restantes estimados</div>
+      <button class="alerta-btn" onclick="fecharAlerta()">Entendido — vou abastecer</button>
+    </div>
+  </div>
+
+<script>
+  // ---- CONFIG DO CELTA 2007 ----
+  const CELTA = {
+    tanque: 48,       // litros totais
+    reserva: 10,      // litros — limite vermelho
+    metade: 24,       // litros — limite amarelo
+    consumo: {
+      gas: { cidade: 10.7, estrada: 12.8 },
+      alc: { cidade: 7.6,  estrada: 9.5  }
+    }
+  };
+
+  // ---- ESTADO ----
+  let estado = {
+    litros: 48,
+    combustivel: 'gas',
+    kmRodados: 0,
+    ultimoAbast: null,
+    viajando: false,
+    posAnterior: null,
+    alertaMostrado: false,
+  };
+
+  // ---- ALERTA DE RESERVA ----
+  function mostrarAlerta() {
+    const overlay = document.getElementById('alerta-overlay');
+    if (!overlay || estado.alertaMostrado) return;
+    estado.alertaMostrado = true;
+
+    // Atualiza km restantes no alerta
+    const cons = CELTA.consumo[estado.combustivel].cidade;
+    const kmRest = Math.max(0, estado.litros * cons);
+    const kmEl = document.getElementById('alerta-km-val');
+    if (kmEl) kmEl.textContent = '~' + Math.round(kmRest);
+
+    overlay.classList.add('ativo');
+
+    // Vibração intensa
+    if (navigator.vibrate) navigator.vibrate([300,100,300,100,300,100,500]);
+
+    // Notificação push (se permitido)
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('⛽ Celta — RESERVA!', {
+        body: 'Menos de 10 litros! Procure um posto agora.',
+        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">⛽</text></svg>'
+      });
+    }
+  }
+
+  function fecharAlerta() {
+    const overlay = document.getElementById('alerta-overlay');
+    if (overlay) overlay.classList.remove('ativo');
+  }
+
+  function pedirPermissaoNotificacao() {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }
+
+  // ---- GPS ----
+  let watchId = null;
+
+  function iniciarViagem() {
+    if (estado.viajando) return;
+    if (!navigator.geolocation) {
+      mostrarToast('GPS não disponível neste dispositivo', '#FF5544'); return;
+    }
+    estado.viajando = true;
+    estado.posAnterior = null;
+    salvar();
+    atualizarBtnViagem();
+    mostrarToast('📍 GPS ativado — boa viagem!');
+
+    watchId = navigator.geolocation.watchPosition(
+      onPosicao,
+      onErroGPS,
+      { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 }
+    );
+  }
+
+  function pararViagem() {
+    if (!estado.viajando) return;
+    estado.viajando = false;
+    estado.posAnterior = null;
+    if (watchId !== null) {
+      navigator.geolocation.clearWatch(watchId);
+      watchId = null;
+    }
+    salvar();
+    atualizarBtnViagem();
+    mostrarToast('⏹ Viagem pausada — ' + estado.kmRodados.toFixed(1) + ' km rodados');
+  }
+
+  function onPosicao(pos) {
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
+    const acc = pos.coords.accuracy; // precisão em metros
+
+    // Ignora leituras imprecisas (mais de 50m de erro)
+    if (acc > 50) return;
+
+    if (estado.posAnterior) {
+      const dist = calcularDistancia(
+        estado.posAnterior.lat, estado.posAnterior.lon, lat, lon
+      );
+      // Ignora movimentos menores que 10m (parado no sinal)
+      if (dist > 0.01) {
+        estado.litros = Math.max(0, estado.litros - (dist / consumoAtual()));
+        estado.kmRodados += dist;
+        salvar();
+        atualizar();
+
+        // Alerta de reserva
+        if (estado.litros <= CELTA.reserva && estado.litros > 0) {
+          mostrarAlerta();
+        }
+        // Reseta alerta se abastecer
+        if (estado.litros > CELTA.reserva) {
+          estado.alertaMostrado = false;
+        }
+      }
+    }
+    estado.posAnterior = { lat, lon };
+  }
+
+  function onErroGPS(err) {
+    let msg = 'Erro no GPS';
+    if (err.code === 1) msg = 'Permita o acesso ao GPS nas configurações';
+    if (err.code === 2) msg = 'GPS indisponível — tente ao ar livre';
+    if (err.code === 3) msg = 'GPS demorou — tente de novo';
+    mostrarToast('⚠️ ' + msg, '#FFB400');
+    estado.viajando = false;
+    atualizarBtnViagem();
+  }
+
+  function calcularDistancia(lat1, lon1, lat2, lon2) {
+    // Fórmula de Haversine — retorna km
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  }
+
+  function consumoAtual() {
+    return CELTA.consumo[estado.combustivel].cidade;
+  }
+
+  function atualizarBtnViagem() {
+    const btn = document.getElementById('btn-viagem');
+    if (!btn) return;
+    if (estado.viajando) {
+      btn.textContent = '⏹ Parar GPS';
+      btn.style.background = '#FF5544';
+      btn.style.boxShadow = '0 8px 24px rgba(255,85,68,0.35)';
+    } else {
+      btn.textContent = '🚗 Iniciar viagem';
+      btn.style.background = '#BF7FFF';
+      btn.style.boxShadow = '0 8px 24px rgba(191,127,255,0.35)';
+    }
+  }
+
+  // ---- COMBUSTÍVEL ----
+  function setFuel(tipo) {
+    estado.combustivel = tipo;
+    document.getElementById('btn-gas').className = 'fuel-btn' + (tipo === 'gas' ? ' active-gas' : '');
+    document.getElementById('btn-alc').className = 'fuel-btn' + (tipo === 'alc' ? ' active-alc' : '');
+    salvar();
+    atualizar();
+  }
+
+  // ---- AJUSTE MANUAL DO TANQUE ----
+  function testarNivel(valor) {
+    estado.litros = parseFloat(valor);
+    const el = document.getElementById('slider-val');
+    if (el) el.textContent = parseFloat(valor).toFixed(1) + ' litros';
+    // Reseta alerta se ajustou pra cima da reserva
+    if (estado.litros > CELTA.reserva) estado.alertaMostrado = false;
+    salvar();
+    atualizar();
+  }
+
+  // ---- ATUALIZAR TELA ----
+  function atualizar() {
+    const L = estado.litros;
+    const pct = Math.max(0, Math.min(100, (L / CELTA.tanque) * 100));
+    const cons = CELTA.consumo[estado.combustivel].cidade;
+    const kmRest = Math.max(0, L * cons);
+
+    // Determina cor
+    let cor, corHex, status, glow;
+    if (L > CELTA.metade) {
+      cor = 'verde';
+      corHex = '#2BD68F';
+      glow = 'rgba(43,214,143,0.15)';
+      status = 'Tanque cheio — bora dirigir! 🚗';
+    } else if (L > CELTA.reserva) {
+      cor = 'amarelo';
+      corHex = '#FFB400';
+      glow = 'rgba(255,180,0,0.15)';
+      status = 'Atenção — vá abastecer em breve ⚠️';
+    } else {
+      cor = 'vermelho';
+      corHex = '#FF5544';
+      glow = 'rgba(255,85,68,0.2)';
+      status = 'RESERVA! Procure um posto agora! 🚨';
+    }
+
+    // Atualiza barra
+    const fill = document.getElementById('tank-fill');
+    fill.style.width = pct + '%';
+    fill.style.background = `linear-gradient(90deg, ${corHex}99, ${corHex})`;
+
+    // Atualiza card
+    const card = document.getElementById('tank-card');
+    card.className = 'tank-card ' + cor;
+    card.style.setProperty('--glow-color', glow);
+    card.style.borderColor = cor === 'verde' ? '#322f37' : corHex + '44';
+
+    // Atualiza textos
+    document.getElementById('tank-pct').textContent = Math.round(pct) + '%';
+    document.getElementById('tank-pct').style.color = corHex;
+    document.getElementById('tank-litros').innerHTML = `<strong>${L.toFixed(1)}</strong> litros restantes`;
+    document.getElementById('km-rest').textContent = Math.round(kmRest);
+    document.getElementById('km-rest').style.color = corHex;
+    document.getElementById('consumo-val').textContent = cons.toFixed(1);
+
+    // Atualiza status badge
+    const badge = document.getElementById('status-badge');
+    badge.style.background = corHex + '18';
+    badge.style.border = `1px solid ${corHex}44`;
+    badge.style.color = corHex;
+    document.getElementById('status-dot').style.background = corHex;
+    document.getElementById('status-text').textContent = status;
+
+    // Pisca se vermelho
+    document.getElementById('status-dot').style.animationDuration =
+      cor === 'vermelho' ? '0.5s' : '1.5s';
+
+    // Atualiza km rodados
+    const kmRodEl = document.getElementById('km-rodados-val');
+    if (kmRodEl) kmRodEl.textContent = estado.kmRodados.toFixed(1) + ' km';
+
+    // Atualiza status GPS
+    const gpsDot = document.getElementById('gps-dot');
+    const gpsStatus = document.getElementById('gps-status');
+    if (gpsDot && gpsStatus) {
+      if (estado.viajando) {
+        gpsDot.style.background = '#2BD68F';
+        gpsDot.style.boxShadow = '0 0 6px #2BD68F';
+        gpsDot.style.animation = 'blink 1s ease-in-out infinite';
+        gpsStatus.innerHTML = '<div id="gps-dot" style="width:8px;height:8px;border-radius:50%;background:#2BD68F;box-shadow:0 0 6px #2BD68F;margin:0 auto 4px;animation:blink 1s ease-in-out infinite;"></div>GPS on';
+        gpsStatus.style.color = '#2BD68F';
+      } else {
+        gpsStatus.innerHTML = '<div id="gps-dot" style="width:8px;height:8px;border-radius:50%;background:#6B6870;margin:0 auto 4px;"></div>GPS off';
+        gpsStatus.style.color = '#6B6870';
+      }
+    }
+  }
+
+  // ---- SALVAR E CARREGAR ----
+  function salvar() {
+    try { localStorage.setItem('celta_estado', JSON.stringify(estado)); } catch(e) {}
+  }
+
+  function carregar() {
+    try {
+      const salvo = localStorage.getItem('celta_estado');
+      if (salvo) {
+        const d = JSON.parse(salvo);
+        estado.litros      = d.litros      ?? 48;
+        estado.combustivel = d.combustivel ?? 'gas';
+        estado.kmRodados   = d.kmRodados   ?? 0;
+        estado.ultimoAbast = d.ultimoAbast ?? null;
+        // viajando sempre começa false — GPS precisa ser reativado manualmente
+        estado.viajando    = false;
+      }
+    } catch(e) {}
+  }
+
+  // ---- TOAST ----
+  function mostrarToast(msg, cor) {
+    cor = cor || '#2BD68F';
+    let t = document.getElementById('toast-msg');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'toast-msg';
+      t.style.cssText = 'position:fixed;bottom:110px;left:50%;transform:translateX(-50%);' +
+        'padding:12px 24px;border-radius:20px;font-size:14px;font-weight:600;' +
+        'z-index:999;opacity:0;transition:opacity 0.3s ease;white-space:nowrap;' +
+        'box-shadow:0 4px 20px rgba(0,0,0,0.3);';
+      document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.style.background = cor;
+    t.style.color = (cor === '#FF5544') ? '#fff' : '#0f0f13';
+    t.style.opacity = '1';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2500);
+  }
+
+  // ---- TANQUE CHEIO (com salvamento) ----
+  function tanqueCheio() {
+    const agora = new Date();
+    const dataHora = agora.toLocaleDateString('pt-BR') + ' às ' +
+                     agora.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+    estado.litros      = CELTA.tanque;
+    estado.kmRodados   = 0;
+    estado.ultimoAbast = dataHora;
+    salvar();
+    document.getElementById('slider').value = CELTA.tanque;
+    document.getElementById('slider-val').textContent = CELTA.tanque + ' litros';
+    atualizarInfoAbast();
+    atualizar();
+    if (navigator.vibrate) navigator.vibrate([100,50,100]);
+    mostrarToast('⛽ Tanque cheio registrado!');
+  }
+
+  // ---- TOGGLE VIAGEM ----
+  function toggleViagem() {
+    if (estado.viajando) pararViagem();
+    else iniciarViagem();
+  }
+
+  // ---- INFO ABASTECIMENTO ----
+  function atualizarInfoAbast() {
+    const el = document.getElementById('ultimo-abast');
+    if (el) {
+      el.textContent = estado.ultimoAbast
+        ? '🕐 Último abastecimento: ' + estado.ultimoAbast
+        : 'Nenhum abastecimento registrado ainda';
+    }
+  }
+
+  // ---- FULLSCREEN ----
+  function entrarTelaCheia() {
+    const el = document.documentElement;
+    try {
+      if (el.requestFullscreen)             el.requestFullscreen();
+      else if (el.webkitRequestFullscreen)  el.webkitRequestFullscreen();
+      else if (el.mozRequestFullScreen)     el.mozRequestFullScreen();
+      else if (el.msRequestFullscreen)      el.msRequestFullscreen();
+    } catch(e) {}
+  }
+
+  // Entra em tela cheia automaticamente no primeiro toque
+  document.addEventListener('touchstart', function handler() {
+    entrarTelaCheia();
+    document.removeEventListener('touchstart', handler);
+  }, { once: true });
+
+  // ---- INIT ----
+  carregar();
+  document.getElementById('slider').value = estado.litros;
+  const sliderValEl = document.getElementById('slider-val');
+  if (sliderValEl) sliderValEl.textContent = parseFloat(estado.litros).toFixed(1) + ' litros';
+  document.getElementById('btn-gas').className = 'fuel-btn' + (estado.combustivel === 'gas' ? ' active-gas' : '');
+  document.getElementById('btn-alc').className  = 'fuel-btn' + (estado.combustivel === 'alc' ? ' active-alc' : '');
+  atualizarInfoAbast();
+  atualizar();
+  pedirPermissaoNotificacao();
+</script>
+</body>
+</html>
