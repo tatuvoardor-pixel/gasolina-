@@ -731,11 +731,16 @@
     <!-- Linha 2: Player de música -->
     <div style="background:#1c1a1f;border:1px solid #322f37;border-radius:16px;padding:12px 14px;">
 
-      <!-- Linha A: capa + nome + artista -->
+      <!-- Linha A: capa + nome + artista + abrir -->
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
 
-        <!-- Capa quadrada preenchida -->
-        <div class="album-cover" id="album-cover" style="margin:0;flex-shrink:0;">🎵</div>
+        <!-- Capa quadrada — contém a imagem inteira sem cortar -->
+        <div id="album-cover-bg" style="
+          width:52px;height:52px;border-radius:10px;
+          background:#25232a;border:1px solid #322f37;
+          display:flex;align-items:center;justify-content:center;
+          font-size:24px;flex-shrink:0;overflow:hidden;
+          position:relative;">🎵</div>
 
         <!-- Nome e artista -->
         <div style="flex:1;min-width:0;">
@@ -743,17 +748,19 @@
           <div class="music-artist-name" id="header-artist-name">—</div>
         </div>
 
-        <!-- Botão abrir arquivo -->
+        <!-- Abrir -->
         <button onclick="selecionarMusica()" style="
           background:#25232a;border:1px solid #322f37;border-radius:10px;
-          color:#9B98A0;font-size:11px;padding:6px 10px;cursor:pointer;
-          flex-shrink:0;white-space:nowrap;">📂</button>
+          color:#9B98A0;font-size:13px;padding:6px 10px;cursor:pointer;flex-shrink:0;">📂</button>
       </div>
 
-      <!-- Linha B: barra de progresso + tempo -->
+      <!-- Barra de progresso -->
       <div style="margin-bottom:10px;">
-        <div class="header-progress-bar" onclick="seekMusica(event)" id="header-progress-bar">
-          <div class="header-progress-fill" id="header-progress-fill"></div>
+        <div style="height:3px;background:#322f37;border-radius:2px;overflow:hidden;cursor:pointer;"
+          onclick="seekMusica(event)" id="header-progress-bar">
+          <div id="header-progress-fill" style="height:100%;width:0%;
+            background:linear-gradient(90deg,#BF7FFF,#9B5FE0);border-radius:2px;
+            transition:width 0.5s linear;"></div>
         </div>
         <div style="display:flex;justify-content:space-between;
           font-size:10px;color:#6B6870;font-family:monospace;margin-top:4px;">
@@ -762,7 +769,7 @@
         </div>
       </div>
 
-      <!-- Linha C: controles centralizados -->
+      <!-- Controles centralizados -->
       <div style="display:flex;align-items:center;justify-content:center;gap:12px;">
         <button class="music-ctrl-btn" onclick="musicaAnterior()">⏮</button>
         <button class="music-ctrl-btn play-main" id="header-play-btn" onclick="toggleMusica()">▶</button>
@@ -1374,13 +1381,15 @@
     const hArtist = document.getElementById('header-artist-name');
     if (hArtist) hArtist.textContent = faixa.artista || 'Artista desconhecido';
 
-    // Atualiza capa
-    const cover = document.getElementById('album-cover');
-    if (cover) {
+    // Atualiza capa no quadrado — imagem inteira sem cortar
+    const coverbg = document.getElementById('album-cover-bg');
+    if (coverbg) {
       if (faixa.capa) {
-        cover.innerHTML = '<img src="' + faixa.capa + '" alt="capa">';
+        coverbg.innerHTML = '<img src="' + faixa.capa + '" style="' +
+          'width:100%;height:100%;object-fit:contain;' +
+          'background:#25232a;display:block;">';
       } else {
-        cover.innerHTML = '🎵';
+        coverbg.innerHTML = '🎵';
       }
     }
 
@@ -1471,20 +1480,16 @@
     tocando = true;
     const pb = document.getElementById('music-play-btn');
     const hb = document.getElementById('header-play-btn');
-    const cover = document.getElementById('album-cover');
     if (pb) pb.textContent = '⏸';
     if (hb) hb.textContent = '⏸';
-    if (cover) cover.classList.add('playing');
   });
 
   audio.addEventListener('pause', () => {
     tocando = false;
     const pb = document.getElementById('music-play-btn');
     const hb = document.getElementById('header-play-btn');
-    const cover = document.getElementById('album-cover');
     if (pb) pb.textContent = '▶';
     if (hb) hb.textContent = '▶';
-    if (cover) cover.classList.remove('playing');
   });
 
   // ---- FULLSCREEN ----
