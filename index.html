@@ -9,1516 +9,742 @@
 <meta name="theme-color" content="#0f0f13">
 <title>Celta ⛽</title>
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230f0f13'/><text y='70' x='50' text-anchor='middle' font-size='60'>⛽</text></svg>">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-  html {
-    height: 100%;
-    height: 100dvh;
-  }
-
-  body {
-    background: #0f0f13;
-    color: #F5F2EE;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    min-height: 100vh;
-    min-height: 100dvh;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 24px 16px 40px;
-    user-select: none;
-    overflow-x: hidden;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* Header */
-  .header {
-    width: 100%;
-    max-width: 420px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 18px;
-    gap: 0;
-    padding: 0 4px;
-  }
-
-  .music-ctrl-btn {
-    background: #25232a;
-    border: 1px solid #322f37;
-    border-radius: 50%;
-    width: 34px;
-    height: 34px;
-    min-width: 34px;
-    font-size: 14px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.15s ease;
-    color: #9B98A0;
-  }
-
-  .music-ctrl-btn.play-main {
-    background: #BF7FFF;
-    color: #0f0f13;
-    width: 38px;
-    height: 38px;
-    min-width: 38px;
-    font-size: 15px;
-    box-shadow: 0 2px 10px rgba(191,127,255,0.35);
-  }
-
-  .music-ctrl-btn:active {
-    transform: scale(0.9);
-    opacity: 0.8;
-  }
-
-  /* Capa do álbum no header */
-  .album-cover {
-    width: 52px;
-    height: 52px;
-    border-radius: 10px;
-    background: #25232a;
-    border: 1px solid #322f37;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    overflow: hidden;
-    flex-shrink: 0;
-    transition: all 0.3s ease;
-  }
-
-  .album-cover img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center center;
-    display: block;
-    border-radius: 0;
-  }
-
-  .album-cover {
-    border-radius: 10px !important;
-  }
-
-  .album-cover.playing {
-    border-color: #BF7FFF;
-    box-shadow: 0 0 16px rgba(191,127,255,0.3);
-  }
-
-  .music-info-center {
-    text-align: center;
-    flex: 1;
-    min-width: 0;
-    padding: 0 8px;
-    overflow: hidden;
-  }
-
-  .music-track-name {
-    font-size: 13px;
-    font-weight: 600;
-    color: #F5F2EE;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin: 0 0 2px;
-  }
-
-  .music-track-name.idle {
-    color: #6B6870;
-    font-weight: 400;
-    font-size: 12px;
-  }
-
-  .music-artist-name {
-    font-size: 11px;
-    color: #6B6870;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin: 0;
-  }
-
-  /* Mini barra de progresso no header */
-  .header-progress {
-    width: 130px;
-    margin: 0 auto 2px;
-  }
-
-  .header-progress-bar {
-    height: 3px;
-    background: #322f37;
-    border-radius: 2px;
-    overflow: hidden;
-    margin-bottom: 3px;
-    cursor: pointer;
-    width: 100%;
-  }
-
-  .header-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #BF7FFF, #9B5FE0);
-    border-radius: 2px;
-    width: 0%;
-    transition: width 0.5s linear;
-  }
-
-  .header-time-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 9px;
-    color: #6B6870;
-    font-family: monospace;
-  }
-
-  .car-name {
-    font-size: 13px;
-    font-weight: 600;
-    color: #9B98A0;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-  }
-
-  .car-model {
-    font-size: 20px;
-    font-weight: 700;
-    color: #F5F2EE;
-    letter-spacing: -0.02em;
-  }
-
-  .fuel-label {
-    font-size: 11px;
-    color: #6B6870;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 4px;
-  }
-
-  .fuel-toggle {
-    display: flex;
-    gap: 6px;
-  }
-
-  .fuel-btn {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    border: 1.5px solid #322f37;
-    background: #25232a;
-    color: #6B6870;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .fuel-btn.active-gas {
-    background: #FFB400;
-    border-color: #FFB400;
-    color: #0f0f13;
-  }
-
-  .fuel-btn.active-alc {
-    background: #00E593;
-    border-color: #00E593;
-    color: #0f0f13;
-  }
-
-  /* Indicador principal do tanque */
-  .tank-card {
-    width: 100%;
-    max-width: 420px;
-    background: #1c1a1f;
-    border-radius: 24px;
-    padding: 24px 20px 28px;
-    margin-bottom: 20px;
-    border: 1px solid #322f37;
-    position: relative;
-    overflow: visible;
-  }
-
-  /* Glow de fundo baseado na cor */
-  .tank-card::before {
-    content: '';
-    position: absolute;
-    top: -40px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    background: radial-gradient(circle, var(--glow-color, rgba(43,214,143,0.15)) 0%, transparent 70%);
-    pointer-events: none;
-    transition: background 0.5s ease;
-  }
-
-  .tank-label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: #6B6870;
-    margin-bottom: 16px;
-    text-align: center;
-  }
-
-  /* Barra do tanque */
-  .tank-bar-wrap {
-    position: relative;
-    height: 28px;
-    background: #25232a;
-    border-radius: 14px;
-    margin-bottom: 10px;
-    overflow: hidden;
-    border: 1px solid #322f37;
-  }
-
-  .tank-bar-fill {
-    height: 100%;
-    border-radius: 14px;
-    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background 0.5s ease;
-    position: relative;
-  }
-
-  .tank-bar-fill::after {
-    content: '';
-    position: absolute;
-    top: 4px;
-    left: 8px;
-    right: 8px;
-    height: 6px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 3px;
-  }
-
-  /* Marcador de reserva (10L) */
-  .tank-reserve-mark {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: rgba(255,85,68,0.6);
-    left: 20.83%; /* 10/48 = 20.83% */
-  }
-
-  .tank-reserve-mark::before {
-    content: '⚠';
-    position: absolute;
-    top: -20px;
-    left: -8px;
-    font-size: 12px;
-    color: #FF5544;
-  }
-
-  /* Marcador de metade */
-  .tank-half-mark {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background: rgba(255,255,255,0.1);
-    left: 50%;
-  }
-
-  /* Porcentagem */
-  .tank-pct {
-    text-align: center;
-    font-size: 56px;
-    font-weight: 800;
-    letter-spacing: -0.04em;
-    line-height: 1.1;
-    margin: 16px 0 8px;
-    transition: color 0.5s ease;
-    overflow: visible;
-  }
-
-  .tank-litros {
-    text-align: center;
-    font-size: 15px;
-    color: #9B98A0;
-    margin-bottom: 20px;
-  }
-
-  .tank-litros strong {
-    color: #F5F2EE;
-    font-weight: 600;
-  }
-
-  /* Divider */
-  .divider {
-    height: 1px;
-    background: #322f37;
-    margin: 0 -4px 20px;
-  }
-
-  /* KM restantes */
-  .km-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .km-item {
-    text-align: center;
-    flex: 1;
-  }
-
-  .km-item + .km-item {
-    border-left: 1px solid #322f37;
-  }
-
-  .km-item-label {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #6B6870;
-    margin-bottom: 4px;
-  }
-
-  .km-item-value {
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    transition: color 0.5s ease;
-  }
-
-  .km-item-unit {
-    font-size: 11px;
-    color: #6B6870;
-    margin-top: 1px;
-  }
-
-  /* Status badge */
-  .status-badge {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px 20px;
-    border-radius: 12px;
-    margin-bottom: 24px;
-    font-size: 13px;
-    font-weight: 600;
-    transition: all 0.5s ease;
-    width: 100%;
-    max-width: 420px;
-  }
-
-  .status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    animation: blink 1.5s ease-in-out infinite;
-  }
-
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-
-  /* Cores do semáforo */
-  .verde {
-    --glow-color: rgba(43,214,143,0.15);
-    --cor: #2BD68F;
-  }
-  .amarelo {
-    --glow-color: rgba(255,180,0,0.15);
-    --cor: #FFB400;
-  }
-  .vermelho {
-    --glow-color: rgba(255,85,68,0.2);
-    --cor: #FF5544;
-  }
-
-  /* Botão Tanque Cheio */
-  .btn-tanque {
-    width: 100%;
-    max-width: 420px;
-    padding: 18px;
-    background: #2BD68F;
-    color: #0f0f13;
-    border: none;
-    border-radius: 16px;
-    font-size: 17px;
-    font-weight: 700;
-    cursor: pointer;
-    letter-spacing: -0.01em;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    box-shadow: 0 8px 24px rgba(43,214,143,0.3);
-    margin-bottom: 12px;
-  }
-
-  .btn-tanque:active {
-    transform: scale(0.97);
-    box-shadow: 0 4px 12px rgba(43,214,143,0.2);
-  }
-
-  .btn-tanque .icon { font-size: 20px; }
-
-  /* Slider de teste (só pra parte 1) */
-  input[type="range"] {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 100%;
-    height: 6px;
-    background: #25232a;
-    border-radius: 3px;
-    outline: none;
-    cursor: pointer;
-  }
-
-  input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 24px;
-    height: 24px;
-    background: #F5F2EE;
-    border-radius: 50%;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-  }
-
-  /* Player de música */
-  .music-panel {
-    width: 100%;
-    max-width: 420px;
-    background: #1c1a1f;
-    border: 1px solid #322f37;
-    border-radius: 24px;
-    padding: 20px;
-    margin-bottom: 20px;
-  }
-
-  .music-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-  }
-
-  .music-title-section {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .music-label {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #6B6870;
-    margin-bottom: 3px;
-  }
-
-  .music-name {
-    font-size: 15px;
-    font-weight: 600;
-    color: #F5F2EE;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .music-name.idle { color: #6B6870; font-weight: 400; font-size: 13px; }
-
-  .music-select-btn {
-    background: #25232a;
-    border: 1px solid #322f37;
-    border-radius: 10px;
-    color: #9B98A0;
-    font-size: 12px;
-    padding: 8px 12px;
-    cursor: pointer;
-    white-space: nowrap;
-    margin-left: 12px;
-    transition: all 0.2s ease;
-  }
-
-  .music-select-btn:active { background: #322f37; }
-
-  /* Barra de progresso */
-  .music-progress-wrap {
-    margin-bottom: 10px;
-  }
-
-  .music-progress-bar {
-    height: 4px;
-    background: #25232a;
-    border-radius: 2px;
-    overflow: hidden;
-    margin-bottom: 4px;
-    cursor: pointer;
-  }
-
-  .music-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #BF7FFF, #9B5FE0);
-    border-radius: 2px;
-    width: 0%;
-    transition: width 0.5s linear;
-  }
-
-  .music-time-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 10px;
-    color: #6B6870;
-    font-family: monospace;
-  }
-
-  /* Controles */
-  .music-controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-  }
-
-  .music-btn {
-    background: none;
-    border: none;
-    color: #9B98A0;
-    cursor: pointer;
-    font-size: 22px;
-    padding: 8px;
-    transition: all 0.15s ease;
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .music-btn:active { background: #25232a; transform: scale(0.9); }
-
-  .music-btn.play-pause {
-    background: #BF7FFF;
-    color: #0f0f13;
-    width: 54px;
-    height: 54px;
-    font-size: 20px;
-    box-shadow: 0 4px 16px rgba(191,127,255,0.35);
-  }
-
-  .music-btn.play-pause:active { transform: scale(0.93); }
-
-  /* Arquivo de input escondido */
-  #music-file-input { display: none; }
-
-  /* Alerta de reserva */
-  .alerta-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(255,85,68,0.15);
-    backdrop-filter: blur(2px);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
-    animation: piscaFundo 0.8s ease-in-out infinite;
-  }
-
-  .alerta-overlay.ativo { display: flex; }
-
-  @keyframes piscaFundo {
-    0%, 100% { background: rgba(255,85,68,0.08); }
-    50%       { background: rgba(255,85,68,0.25); }
-  }
-
-  .alerta-box {
-    background: #1c1a1f;
-    border: 2px solid #FF5544;
-    border-radius: 24px;
-    padding: 32px 28px;
-    text-align: center;
-    max-width: 320px;
-    width: 90%;
-    box-shadow: 0 0 40px rgba(255,85,68,0.4);
-    animation: piscaBorda 0.8s ease-in-out infinite;
-  }
-
-  @keyframes piscaBorda {
-    0%, 100% { border-color: #FF5544; box-shadow: 0 0 20px rgba(255,85,68,0.3); }
-    50%       { border-color: #ff8877; box-shadow: 0 0 50px rgba(255,85,68,0.6); }
-  }
-
-  .alerta-emoji {
-    font-size: 56px;
-    margin-bottom: 12px;
-    animation: balanco 0.5s ease-in-out infinite alternate;
-  }
-
-  @keyframes balanco {
-    from { transform: rotate(-10deg) scale(1.0); }
-    to   { transform: rotate(10deg)  scale(1.1); }
-  }
-
-  .alerta-titulo {
-    font-size: 24px;
-    font-weight: 800;
-    color: #FF5544;
-    margin-bottom: 8px;
-    letter-spacing: -0.02em;
-  }
-
-  .alerta-sub {
-    font-size: 14px;
-    color: #9B98A0;
-    line-height: 1.5;
-    margin-bottom: 20px;
-  }
-
-  .alerta-km {
-    font-size: 36px;
-    font-weight: 800;
-    color: #FF5544;
-    letter-spacing: -0.03em;
-    margin-bottom: 4px;
-  }
-
-  .alerta-km-label {
-    font-size: 12px;
-    color: #6B6870;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 24px;
-  }
-
-  .alerta-btn {
-    width: 100%;
-    padding: 14px;
-    background: #FF5544;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .alerta-btn:active { transform: scale(0.97); }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  background: #0f0f13;
+  color: #F5F2EE;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 16px 40px;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== HEADER ===== */
+.header {
+  width: 100%;
+  max-width: 420px;
+  margin-bottom: 16px;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.car-name { font-size: 12px; font-weight: 600; color: #9B98A0; text-transform: uppercase; letter-spacing: 0.12em; }
+.car-model { font-size: 20px; font-weight: 700; color: #F5F2EE; letter-spacing: -0.02em; }
+
+.fuel-label { font-size: 10px; color: #6B6870; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; text-align: right; }
+.fuel-toggle { display: flex; gap: 6px; }
+.fuel-btn {
+  padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  border: 1.5px solid #322f37; background: #25232a; color: #6B6870; cursor: pointer;
+}
+.fuel-btn.active-gas { background: #FFB400; border-color: #FFB400; color: #0f0f13; }
+.fuel-btn.active-alc { background: #00E593; border-color: #00E593; color: #0f0f13; }
+
+/* ===== PLAYER CARD ===== */
+.player-card {
+  background: #1c1a1f;
+  border: 1px solid #322f37;
+  border-radius: 16px;
+  padding: 12px 14px;
+}
+
+.player-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+/* CAPA — div com background-image, sempre preenche tudo */
+.album-art {
+  width: 60px;
+  height: 60px;
+  min-width: 60px;
+  border-radius: 10px;
+  background: #25232a center/cover no-repeat;
+  border: 1px solid #322f37;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  flex-shrink: 0;
+}
+
+.track-info { flex: 1; min-width: 0; }
+.track-name {
+  font-size: 14px; font-weight: 600; color: #F5F2EE;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+.track-name.idle { color: #6B6870; font-weight: 400; font-size: 13px; }
+.track-artist { font-size: 12px; color: #6B6870; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.open-btn {
+  background: #25232a; border: 1px solid #322f37; border-radius: 10px;
+  color: #9B98A0; font-size: 16px; padding: 8px 10px; cursor: pointer; flex-shrink: 0;
+}
+
+.progress-bar {
+  height: 3px; background: #322f37; border-radius: 2px; overflow: hidden;
+  cursor: pointer; margin-bottom: 4px;
+}
+.progress-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, #BF7FFF, #9B5FE0);
+  border-radius: 2px; transition: width 0.5s linear;
+}
+.time-row {
+  display: flex; justify-content: space-between;
+  font-size: 10px; color: #6B6870; font-family: monospace;
+  margin-bottom: 10px;
+}
+
+.player-controls {
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+}
+.ctrl-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: #25232a; border: 1px solid #322f37;
+  color: #9B98A0; font-size: 15px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.ctrl-btn.play {
+  width: 46px; height: 46px; font-size: 18px;
+  background: #BF7FFF; border-color: #BF7FFF; color: #0f0f13;
+  box-shadow: 0 4px 16px rgba(191,127,255,0.4);
+}
+.ctrl-btn:active { transform: scale(0.9); }
+
+/* ===== TANK CARD ===== */
+.tank-card {
+  width: 100%; max-width: 420px;
+  background: #1c1a1f; border-radius: 24px;
+  padding: 22px 20px; margin-bottom: 16px;
+  border: 1px solid #322f37; position: relative;
+}
+.tank-label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em;
+  color: #6B6870; margin-bottom: 14px; text-align: center;
+}
+.tank-bar-wrap {
+  position: relative; height: 24px; background: #25232a;
+  border-radius: 12px; margin-bottom: 8px; overflow: hidden; border: 1px solid #322f37;
+}
+.tank-bar-fill {
+  height: 100%; border-radius: 12px; transition: width 0.8s ease, background 0.5s ease;
+}
+.tank-reserve-mark {
+  position: absolute; top: 0; bottom: 0; width: 2px;
+  background: rgba(255,85,68,0.6); left: 20.83%;
+}
+.tank-half-mark {
+  position: absolute; top: 0; bottom: 0; width: 1px;
+  background: rgba(255,255,255,0.1); left: 50%;
+}
+.tank-marks {
+  display: flex; justify-content: space-between;
+  font-size: 10px; color: #6B6870; margin-bottom: 14px; padding: 0 2px;
+}
+.tank-pct {
+  text-align: center; font-size: 54px; font-weight: 800;
+  letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 6px;
+}
+.tank-litros { text-align: center; font-size: 15px; color: #9B98A0; margin-bottom: 18px; }
+.tank-litros strong { color: #F5F2EE; font-weight: 600; }
+.divider { height: 1px; background: #322f37; margin: 0 -4px 18px; }
+.km-row { display: flex; }
+.km-item { text-align: center; flex: 1; }
+.km-item + .km-item { border-left: 1px solid #322f37; }
+.km-item-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #6B6870; margin-bottom: 4px; }
+.km-item-value { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+.km-item-unit { font-size: 11px; color: #6B6870; margin-top: 2px; }
+
+/* ===== STATUS ===== */
+.status-badge {
+  width: 100%; max-width: 420px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 20px; border-radius: 12px; margin-bottom: 14px;
+  font-size: 13px; font-weight: 600; border: 1px solid transparent;
+}
+.status-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  animation: blink 1.5s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ===== BOTÕES PRINCIPAIS ===== */
+.main-btn {
+  width: 100%; max-width: 420px; padding: 17px;
+  border: none; border-radius: 16px; font-size: 17px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  gap: 10px; margin-bottom: 12px; transition: all 0.15s ease;
+}
+.main-btn:active { transform: scale(0.97); }
+.btn-tanque { background: #2BD68F; color: #0f0f13; box-shadow: 0 6px 20px rgba(43,214,143,0.3); }
+.btn-viagem { background: #BF7FFF; color: #0f0f13; box-shadow: 0 6px 20px rgba(191,127,255,0.3); }
+.btn-viagem.ativo { background: #FF5544; box-shadow: 0 6px 20px rgba(255,85,68,0.3); }
+
+/* ===== KM RODADOS ===== */
+.km-rodados-card {
+  width: 100%; max-width: 420px;
+  display: flex; justify-content: space-between; align-items: center;
+  background: #1c1a1f; border: 1px solid #322f37; border-radius: 16px;
+  padding: 12px 18px; margin-bottom: 14px;
+}
+.km-rodados-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #6B6870; margin-bottom: 4px; }
+.km-rodados-val { font-size: 26px; font-weight: 800; color: #F5F2EE; letter-spacing: -0.02em; }
+.gps-indicator { text-align: center; font-size: 11px; color: #6B6870; }
+.gps-dot { width: 8px; height: 8px; border-radius: 50%; background: #6B6870; margin: 0 auto 3px; }
+.gps-dot.on { background: #2BD68F; box-shadow: 0 0 8px #2BD68F; animation: blink 1s ease-in-out infinite; }
+
+/* ===== ÚLTIMO ABAST ===== */
+.ultimo-abast {
+  width: 100%; max-width: 420px; text-align: center;
+  font-size: 12px; color: #6B6870; margin-bottom: 16px;
+  padding: 10px; background: #1c1a1f; border-radius: 12px; border: 1px solid #322f37;
+}
+
+/* ===== SLIDER ===== */
+.slider-card {
+  width: 100%; max-width: 420px;
+  background: #1c1a1f; border: 1px solid #322f37; border-radius: 16px;
+  padding: 14px 18px; margin-bottom: 12px;
+}
+.slider-label {
+  display: flex; justify-content: space-between;
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+  color: #6B6870; margin-bottom: 10px;
+}
+.slider-label span { color: #F5F2EE; font-weight: 600; }
+input[type="range"] {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 6px; background: #25232a; border-radius: 3px; outline: none; cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 22px; height: 22px;
+  background: #F5F2EE; border-radius: 50%; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+.slider-marks {
+  display: flex; justify-content: space-between;
+  font-size: 10px; color: #6B6870; margin-top: 6px;
+}
+
+/* ===== ALERTA RESERVA ===== */
+.alerta-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(255,85,68,0.1); backdrop-filter: blur(4px);
+  z-index: 100; align-items: center; justify-content: center;
+  animation: piscaFundo 0.8s ease-in-out infinite;
+}
+.alerta-overlay.ativo { display: flex; }
+@keyframes piscaFundo { 0%,100%{background:rgba(255,85,68,0.08)} 50%{background:rgba(255,85,68,0.22)} }
+.alerta-box {
+  background: #1c1a1f; border: 2px solid #FF5544; border-radius: 24px;
+  padding: 32px 28px; text-align: center; max-width: 320px; width: 90%;
+  box-shadow: 0 0 40px rgba(255,85,68,0.4);
+  animation: piscaBorda 0.8s ease-in-out infinite;
+}
+@keyframes piscaBorda { 0%,100%{box-shadow:0 0 20px rgba(255,85,68,0.3)} 50%{box-shadow:0 0 50px rgba(255,85,68,0.6)} }
+.alerta-emoji { font-size: 52px; margin-bottom: 12px; }
+.alerta-titulo { font-size: 24px; font-weight: 800; color: #FF5544; margin-bottom: 8px; }
+.alerta-sub { font-size: 14px; color: #9B98A0; line-height: 1.5; margin-bottom: 16px; }
+.alerta-km { font-size: 34px; font-weight: 800; color: #FF5544; margin-bottom: 4px; }
+.alerta-km-label { font-size: 11px; color: #6B6870; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 20px; }
+.alerta-btn {
+  width: 100%; padding: 14px; background: #FF5544; color: white;
+  border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer;
+}
+
+/* TOAST */
+#toast {
+  position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+  padding: 12px 24px; border-radius: 20px; font-size: 14px; font-weight: 600;
+  z-index: 999; opacity: 0; transition: opacity 0.3s ease; white-space: nowrap;
+  pointer-events: none;
+}
+#music-file-input { display: none; }
 </style>
 </head>
 <body>
 
-  <!-- Header -->
-  <div style="width:100%;max-width:420px;margin-bottom:18px;">
-
-    <!-- Linha 1: Celta Spirit + GAS/ALC -->
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-      <div>
-        <div class="car-name">Chevrolet</div>
-        <div class="car-model">Celta Spirit</div>
-      </div>
-      <div>
-        <div class="fuel-label" style="text-align:right;">Combustível</div>
-        <div class="fuel-toggle">
-          <button class="fuel-btn active-gas" id="btn-gas" onclick="setFuel('gas')">GAS</button>
-          <button class="fuel-btn" id="btn-alc" onclick="setFuel('alc')">ALC</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Linha 2: Player de música -->
-    <div style="background:#1c1a1f;border:1px solid #322f37;border-radius:16px;padding:12px 14px;">
-
-      <!-- Linha A: capa + nome + artista + abrir -->
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-
-        <!-- Capa quadrada — contém a imagem inteira sem cortar -->
-        <div id="album-cover-bg" style="
-          width:64px;height:64px;border-radius:10px;
-          background:#25232a;border:1px solid #322f37;
-          display:flex;align-items:center;justify-content:center;
-          font-size:24px;flex-shrink:0;overflow:hidden;
-          position:relative;">🎵</div>
-
-        <!-- Nome e artista -->
-        <div style="flex:1;min-width:0;">
-          <div class="music-track-name idle" id="header-music-name">Selecione uma música</div>
-          <div class="music-artist-name" id="header-artist-name">—</div>
-        </div>
-
-        <!-- Abrir -->
-        <button onclick="selecionarMusica()" style="
-          background:#25232a;border:1px solid #322f37;border-radius:10px;
-          color:#9B98A0;font-size:13px;padding:6px 10px;cursor:pointer;flex-shrink:0;">📂</button>
-      </div>
-
-      <!-- Barra de progresso -->
-      <div style="margin-bottom:10px;">
-        <div style="height:3px;background:#322f37;border-radius:2px;overflow:hidden;cursor:pointer;"
-          onclick="seekMusica(event)" id="header-progress-bar">
-          <div id="header-progress-fill" style="height:100%;width:0%;
-            background:linear-gradient(90deg,#BF7FFF,#9B5FE0);border-radius:2px;
-            transition:width 0.5s linear;"></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;
-          font-size:10px;color:#6B6870;font-family:monospace;margin-top:4px;">
-          <span id="header-cur-time">0:00</span>
-          <span id="header-dur-time">0:00</span>
-        </div>
-      </div>
-
-      <!-- Controles centralizados -->
-      <div style="display:flex;align-items:center;justify-content:center;gap:12px;">
-        <button class="music-ctrl-btn" onclick="musicaAnterior()">⏮</button>
-        <button class="music-ctrl-btn play-main" id="header-play-btn" onclick="toggleMusica()">▶</button>
-        <button class="music-ctrl-btn" onclick="proximaMusica()">⏭</button>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Card do tanque -->
-  <div class="tank-card verde" id="tank-card">
-    <div class="tank-label">Nível do tanque · 48 litros</div>
-
-    <!-- Barra -->
-    <div class="tank-bar-wrap">
-      <div class="tank-bar-fill" id="tank-fill"></div>
-      <div class="tank-reserve-mark"></div>
-      <div class="tank-half-mark"></div>
-    </div>
-
-    <!-- Marcadores -->
-    <div style="display:flex;justify-content:space-between;font-size:10px;color:#6B6870;margin-bottom:16px;padding:0 2px;">
-      <span>0L</span>
-      <span style="margin-left:12%">⚠10L</span>
-      <span>24L</span>
-      <span>48L</span>
-    </div>
-
-    <!-- Percentual grande -->
-    <div class="tank-pct" id="tank-pct">100%</div>
-    <div class="tank-litros" id="tank-litros"><strong>48.0</strong> litros restantes</div>
-
-    <div class="divider"></div>
-
-    <!-- KM restantes -->
-    <div class="km-row">
-      <div class="km-item">
-        <div class="km-item-label">KM restantes</div>
-        <div class="km-item-value" id="km-rest">—</div>
-        <div class="km-item-unit">quilômetros</div>
-      </div>
-      <div class="km-item">
-        <div class="km-item-label">Consumo médio</div>
-        <div class="km-item-value" id="consumo-val">10.7</div>
-        <div class="km-item-unit">km/litro</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Badge de status -->
-  <div class="status-badge" id="status-badge">
-    <div class="status-dot" id="status-dot"></div>
-    <span id="status-text">Tanque cheio — bora dirigir! 🚗</span>
-  </div>
-
-  <!-- Botão tanque cheio -->
-  <button class="btn-tanque" id="btn-tanque" onclick="tanqueCheio()">
-    <span class="icon">⛽</span>
-    Tanque Cheio
-  </button>
-
-  <!-- KM rodados na viagem atual -->
-  <div style="width:100%;max-width:360px;display:flex;justify-content:space-between;
-    align-items:center;background:#1c1a1f;border:1px solid #322f37;border-radius:16px;
-    padding:14px 20px;margin-bottom:14px;">
+<!-- Header -->
+<div class="header">
+  <div class="header-top">
     <div>
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;
-        color:#6B6870;margin-bottom:4px;">KM rodados agora</div>
-      <div id="km-rodados-val" style="font-size:28px;font-weight:800;
-        color:#F5F2EE;letter-spacing:-0.02em;">0.0 km</div>
+      <div class="car-name">Chevrolet</div>
+      <div class="car-model">Celta Spirit</div>
     </div>
-    <div id="gps-status" style="font-size:11px;color:#6B6870;text-align:center;">
-      <div style="width:8px;height:8px;border-radius:50%;background:#6B6870;
-        margin:0 auto 4px;" id="gps-dot"></div>
-      GPS off
-    </div>
-  </div>
-
-  <!-- Botão iniciar/parar viagem -->
-  <button id="btn-viagem" onclick="toggleViagem()" style="
-    width:100%;max-width:360px;padding:18px;background:#BF7FFF;
-    color:#0f0f13;border:none;border-radius:16px;font-size:17px;font-weight:700;
-    cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
-    box-shadow:0 8px 24px rgba(191,127,255,0.35);margin-bottom:12px;
-    transition:all 0.2s ease;">
-    🚗 Iniciar viagem
-  </button>
-
-  <!-- Info abastecimento -->
-  <div id="ultimo-abast" style="width:100%;max-width:360px;text-align:center;
-    font-size:12px;color:#6B6870;margin-bottom:16px;padding:10px 16px;
-    background:#1c1a1f;border-radius:12px;border:1px solid #322f37;">
-    Nenhum abastecimento registrado ainda
-  </div>
-
-  <!-- Ajuste manual do nível -->
-  <div style="width:100%;max-width:360px;background:#1c1a1f;border:1px solid #322f37;
-    border-radius:16px;padding:16px 20px;margin-bottom:12px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-      <span style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#6B6870;">
-        Ajuste manual do tanque
-      </span>
-      <span id="slider-val" style="font-size:13px;font-weight:600;color:#F5F2EE;
-        font-family:monospace;"></span>
-    </div>
-    <input type="range" id="slider" min="0" max="48" value="48" step="0.5"
-           oninput="testarNivel(this.value)" style="width:100%;">
-    <div style="display:flex;justify-content:space-between;font-size:10px;
-      color:#6B6870;margin-top:6px;">
-      <span>0L vazio</span>
-      <span>⚠️ 10L reserva</span>
-      <span>48L cheio</span>
-    </div>
-  </div>
-
-  <!-- Player de música -->
-  <div class="music-panel">
-    <div class="music-header">
-      <div class="music-title-section">
-        <div class="music-label">🎵 Música</div>
-        <div class="music-name idle" id="music-name">Selecione uma música</div>
-      </div>
-      <button class="music-select-btn" onclick="selecionarMusica()">📂 Abrir</button>
-    </div>
-
-    <div class="music-progress-wrap">
-      <div class="music-progress-bar" id="music-progress-bar" onclick="seekMusica(event)">
-        <div class="music-progress-fill" id="music-progress-fill"></div>
-      </div>
-      <div class="music-time-row">
-        <span id="music-cur-time">0:00</span>
-        <span id="music-dur-time">0:00</span>
+    <div>
+      <div class="fuel-label">Combustível</div>
+      <div class="fuel-toggle">
+        <button class="fuel-btn active-gas" id="btn-gas" onclick="setFuel('gas')">GAS</button>
+        <button class="fuel-btn" id="btn-alc" onclick="setFuel('alc')">ALC</button>
       </div>
     </div>
-
-    <div class="music-controls">
-      <button class="music-btn" onclick="musicaAnterior()" title="Anterior">⏮</button>
-      <button class="music-btn play-pause" id="music-play-btn" onclick="toggleMusica()">▶</button>
-      <button class="music-btn" onclick="proximaMusica()" title="Próxima">⏭</button>
-    </div>
   </div>
 
-  <input type="file" id="music-file-input" accept="audio/*" multiple onchange="carregarMusicas(event)">
+  <!-- Player -->
+  <div class="player-card">
+    <div class="player-top">
+      <!-- CAPA: div com background-image, sempre preenche o quadrado todo -->
+      <div class="album-art" id="album-art">🎵</div>
 
-  <!-- Overlay de alerta de reserva -->
-  <div class="alerta-overlay" id="alerta-overlay">
-    <div class="alerta-box">
-      <div class="alerta-emoji">⛽</div>
-      <div class="alerta-titulo">RESERVA!</div>
-      <div class="alerta-sub">Seu Celta está com menos de<br><strong style="color:#FF5544">10 litros</strong> — procure um posto!</div>
-      <div class="alerta-km" id="alerta-km-val">~100</div>
-      <div class="alerta-km-label">km restantes estimados</div>
-      <button class="alerta-btn" onclick="fecharAlerta()">Entendido — vou abastecer</button>
+      <div class="track-info">
+        <div class="track-name idle" id="track-name">Selecione uma música</div>
+        <div class="track-artist" id="track-artist">—</div>
+      </div>
+
+      <button class="open-btn" onclick="selecionarMusica()">📂</button>
+    </div>
+
+    <div class="progress-bar" onclick="seekMusica(event)" id="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <div class="time-row">
+      <span id="cur-time">0:00</span>
+      <span id="dur-time">0:00</span>
+    </div>
+
+    <div class="player-controls">
+      <button class="ctrl-btn" onclick="musicaAnterior()">⏮</button>
+      <button class="ctrl-btn play" id="play-btn" onclick="toggleMusica()">▶</button>
+      <button class="ctrl-btn" onclick="proximaMusica()">⏭</button>
     </div>
   </div>
+</div>
+
+<!-- Tank card -->
+<div class="tank-card" id="tank-card">
+  <div class="tank-label">Nível do tanque · 48 litros</div>
+  <div class="tank-bar-wrap">
+    <div class="tank-bar-fill" id="tank-fill"></div>
+    <div class="tank-reserve-mark"></div>
+    <div class="tank-half-mark"></div>
+  </div>
+  <div class="tank-marks">
+    <span>0L</span><span>⚠️10L</span><span>24L</span><span>48L</span>
+  </div>
+  <div class="tank-pct" id="tank-pct">100%</div>
+  <div class="tank-litros" id="tank-litros"><strong>48.0</strong> litros restantes</div>
+  <div class="divider"></div>
+  <div class="km-row">
+    <div class="km-item">
+      <div class="km-item-label">KM restantes</div>
+      <div class="km-item-value" id="km-rest">—</div>
+      <div class="km-item-unit">quilômetros</div>
+    </div>
+    <div class="km-item">
+      <div class="km-item-label">Consumo médio</div>
+      <div class="km-item-value" id="consumo-val">10.7</div>
+      <div class="km-item-unit">km/litro</div>
+    </div>
+  </div>
+</div>
+
+<!-- Status -->
+<div class="status-badge" id="status-badge">
+  <div class="status-dot" id="status-dot"></div>
+  <span id="status-text">Tanque cheio — bora dirigir! 🚗</span>
+</div>
+
+<!-- Botão tanque cheio -->
+<button class="main-btn btn-tanque" onclick="tanqueCheio()">⛽ Tanque Cheio</button>
+
+<!-- KM rodados -->
+<div class="km-rodados-card">
+  <div>
+    <div class="km-rodados-label">KM rodados agora</div>
+    <div class="km-rodados-val" id="km-rodados">0.0 km</div>
+  </div>
+  <div class="gps-indicator">
+    <div class="gps-dot" id="gps-dot"></div>
+    <span id="gps-label">GPS off</span>
+  </div>
+</div>
+
+<!-- Botão viagem -->
+<button class="main-btn btn-viagem" id="btn-viagem" onclick="toggleViagem()">🚗 Iniciar viagem</button>
+
+<!-- Último abastecimento -->
+<div class="ultimo-abast" id="ultimo-abast">Nenhum abastecimento registrado</div>
+
+<!-- Ajuste manual -->
+<div class="slider-card">
+  <div class="slider-label">
+    <span>Ajuste manual do tanque</span>
+    <span id="slider-val">48.0 litros</span>
+  </div>
+  <input type="range" id="slider" min="0" max="48" value="48" step="0.5"
+    oninput="ajustarTanque(this.value)">
+  <div class="slider-marks">
+    <span>0L vazio</span><span>⚠️ 10L reserva</span><span>48L cheio</span>
+  </div>
+</div>
+
+<!-- Alerta reserva -->
+<div class="alerta-overlay" id="alerta-overlay">
+  <div class="alerta-box">
+    <div class="alerta-emoji">⛽</div>
+    <div class="alerta-titulo">RESERVA!</div>
+    <div class="alerta-sub">Menos de <strong style="color:#FF5544">10 litros</strong> — procure um posto!</div>
+    <div class="alerta-km" id="alerta-km">~100</div>
+    <div class="alerta-km-label">km restantes estimados</div>
+    <button class="alerta-btn" onclick="fecharAlerta()">Entendido — vou abastecer</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+<input type="file" id="music-file-input" accept="audio/*" multiple onchange="carregarMusicas(event)">
 
 <script>
-  // ---- CONFIG DO CELTA 2007 ----
-  const CELTA = {
-    tanque: 48,       // litros totais
-    reserva: 10,      // litros — limite vermelho
-    metade: 24,       // litros — limite amarelo
-    consumo: {
-      gas: { cidade: 10.7, estrada: 12.8 },
-      alc: { cidade: 7.6,  estrada: 9.5  }
-    }
-  };
+'use strict';
 
-  // ---- ESTADO ----
-  let estado = {
-    litros: 48,
-    combustivel: 'gas',
-    kmRodados: 0,
-    ultimoAbast: null,
-    viajando: false,
-    posAnterior: null,
-    alertaMostrado: false,
-  };
+// ===== CONFIG =====
+const CELTA = {
+  tanque: 48, reserva: 10, metade: 24,
+  consumo: { gas: { cidade: 10.7 }, alc: { cidade: 7.6 } }
+};
 
-  // ---- ALERTA DE RESERVA ----
-  function mostrarAlerta() {
-    const overlay = document.getElementById('alerta-overlay');
-    if (!overlay || estado.alertaMostrado) return;
-    estado.alertaMostrado = true;
+// ===== ESTADO =====
+let estado = {
+  litros: 48, combustivel: 'gas', kmRodados: 0,
+  ultimoAbast: null, viajando: false, posAnterior: null, alertaMostrado: false
+};
 
-    // Atualiza km restantes no alerta
-    const cons = CELTA.consumo[estado.combustivel].cidade;
-    const kmRest = Math.max(0, estado.litros * cons);
-    const kmEl = document.getElementById('alerta-km-val');
-    if (kmEl) kmEl.textContent = '~' + Math.round(kmRest);
+// ===== SAVE/LOAD =====
+function salvar() { try { localStorage.setItem('celta', JSON.stringify(estado)); } catch(e){} }
+function carregar() {
+  try {
+    const d = JSON.parse(localStorage.getItem('celta') || '{}');
+    estado.litros      = d.litros      ?? 48;
+    estado.combustivel = d.combustivel ?? 'gas';
+    estado.kmRodados   = d.kmRodados   ?? 0;
+    estado.ultimoAbast = d.ultimoAbast ?? null;
+    estado.viajando    = false;
+  } catch(e){}
+}
 
-    overlay.classList.add('ativo');
+// ===== TOAST =====
+let toastTimer;
+function toast(msg, cor) {
+  cor = cor || '#2BD68F';
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = cor;
+  t.style.color = (cor === '#FF5544') ? '#fff' : '#0f0f13';
+  t.style.boxShadow = '0 4px 20px rgba(0,0,0,0.3)';
+  t.style.opacity = '1';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.style.opacity = '0', 2500);
+}
 
-    // Vibração intensa
-    if (navigator.vibrate) navigator.vibrate([300,100,300,100,300,100,500]);
+// ===== TEMPO =====
+function fmtTempo(s) {
+  if (!isFinite(s) || s < 0) return '0:00';
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return m + ':' + String(sec).padStart(2, '0');
+}
 
-    // Notificação push (se permitido)
-    if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification('⛽ Celta — RESERVA!', {
-        body: 'Menos de 10 litros! Procure um posto agora.',
-        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">⛽</text></svg>'
-      });
+// ===== COMBUSTÍVEL =====
+function setFuel(tipo) {
+  estado.combustivel = tipo;
+  document.getElementById('btn-gas').className = 'fuel-btn' + (tipo==='gas' ? ' active-gas' : '');
+  document.getElementById('btn-alc').className = 'fuel-btn' + (tipo==='alc' ? ' active-alc' : '');
+  salvar(); atualizar();
+}
+
+// ===== TANQUE CHEIO =====
+function tanqueCheio() {
+  const agora = new Date();
+  estado.litros = CELTA.tanque;
+  estado.kmRodados = 0;
+  estado.alertaMostrado = false;
+  estado.ultimoAbast = agora.toLocaleDateString('pt-BR') + ' às ' +
+    agora.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+  salvar();
+  document.getElementById('slider').value = CELTA.tanque;
+  document.getElementById('slider-val').textContent = CELTA.tanque + '.0 litros';
+  atualizarAbast(); atualizar();
+  if (navigator.vibrate) navigator.vibrate([100,50,100]);
+  toast('⛽ Tanque cheio registrado!');
+}
+
+// ===== AJUSTE MANUAL =====
+function ajustarTanque(val) {
+  estado.litros = parseFloat(val);
+  document.getElementById('slider-val').textContent = parseFloat(val).toFixed(1) + ' litros';
+  if (estado.litros > CELTA.reserva) estado.alertaMostrado = false;
+  salvar(); atualizar();
+}
+
+// ===== ALERTA =====
+function mostrarAlerta() {
+  if (estado.alertaMostrado) return;
+  estado.alertaMostrado = true;
+  const cons = CELTA.consumo[estado.combustivel].cidade;
+  document.getElementById('alerta-km').textContent = '~' + Math.round(estado.litros * cons);
+  document.getElementById('alerta-overlay').classList.add('ativo');
+  if (navigator.vibrate) navigator.vibrate([300,100,300,100,300,100,500]);
+}
+function fecharAlerta() {
+  document.getElementById('alerta-overlay').classList.remove('ativo');
+}
+
+// ===== GPS =====
+let watchId = null;
+
+function toggleViagem() {
+  if (estado.viajando) pararViagem(); else iniciarViagem();
+}
+
+function iniciarViagem() {
+  if (!navigator.geolocation) { toast('GPS não disponível', '#FF5544'); return; }
+  estado.viajando = true; estado.posAnterior = null;
+  salvar(); atualizarBtnViagem();
+  watchId = navigator.geolocation.watchPosition(onPos, onErroGPS,
+    { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 });
+  toast('📍 GPS ativado — boa viagem!');
+}
+
+function pararViagem() {
+  estado.viajando = false; estado.posAnterior = null;
+  if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+  salvar(); atualizarBtnViagem();
+  toast('⏹ Pausado — ' + estado.kmRodados.toFixed(1) + ' km rodados');
+}
+
+function onPos(pos) {
+  const { latitude: lat, longitude: lon, accuracy: acc } = pos.coords;
+  if (acc > 50) return;
+  if (estado.posAnterior) {
+    const dist = haversine(estado.posAnterior.lat, estado.posAnterior.lon, lat, lon);
+    if (dist > 0.01) {
+      estado.litros = Math.max(0, estado.litros - dist / CELTA.consumo[estado.combustivel].cidade);
+      estado.kmRodados += dist;
+      salvar(); atualizar();
+      if (estado.litros <= CELTA.reserva) mostrarAlerta();
+      else estado.alertaMostrado = false;
     }
   }
+  estado.posAnterior = { lat, lon };
+}
 
-  function fecharAlerta() {
-    const overlay = document.getElementById('alerta-overlay');
-    if (overlay) overlay.classList.remove('ativo');
+function onErroGPS(err) {
+  const msgs = ['', 'Permita o GPS nas configurações', 'GPS indisponível', 'GPS demorou'];
+  toast('⚠️ ' + (msgs[err.code] || 'Erro no GPS'), '#FFB400');
+  estado.viajando = false; atualizarBtnViagem();
+}
+
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371, d2r = Math.PI/180;
+  const dLat = (lat2-lat1)*d2r, dLon = (lon2-lon1)*d2r;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*d2r)*Math.cos(lat2*d2r)*Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function atualizarBtnViagem() {
+  const btn = document.getElementById('btn-viagem');
+  const dot = document.getElementById('gps-dot');
+  const lbl = document.getElementById('gps-label');
+  if (estado.viajando) {
+    btn.textContent = '⏹ Parar GPS'; btn.className = 'main-btn btn-viagem ativo';
+    dot.className = 'gps-dot on'; lbl.textContent = 'GPS on';
+  } else {
+    btn.textContent = '🚗 Iniciar viagem'; btn.className = 'main-btn btn-viagem';
+    dot.className = 'gps-dot'; lbl.textContent = 'GPS off';
   }
+}
 
-  function pedirPermissaoNotificacao() {
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission();
-    }
-  }
+function atualizarAbast() {
+  const el = document.getElementById('ultimo-abast');
+  el.textContent = estado.ultimoAbast
+    ? '🕐 Último abast: ' + estado.ultimoAbast
+    : 'Nenhum abastecimento registrado';
+}
 
-  // ---- GPS ----
-  let watchId = null;
+// ===== ATUALIZAR TELA =====
+function atualizar() {
+  const L = estado.litros;
+  const pct = Math.max(0, Math.min(100, L / CELTA.tanque * 100));
+  const cons = CELTA.consumo[estado.combustivel].cidade;
+  const kmRest = Math.max(0, L * cons);
 
-  function iniciarViagem() {
-    if (estado.viajando) return;
-    if (!navigator.geolocation) {
-      mostrarToast('GPS não disponível neste dispositivo', '#FF5544'); return;
-    }
-    estado.viajando = true;
-    estado.posAnterior = null;
-    salvar();
-    atualizarBtnViagem();
-    mostrarToast('📍 GPS ativado — boa viagem!');
+  let cor, hex, status;
+  if (L > CELTA.metade)    { cor='verde';   hex='#2BD68F'; status='Tanque cheio — bora dirigir! 🚗'; }
+  else if (L > CELTA.reserva) { cor='amarelo'; hex='#FFB400'; status='Atenção — abasteça em breve ⚠️'; }
+  else                     { cor='vermelho'; hex='#FF5544'; status='RESERVA! Procure um posto! 🚨'; }
 
-    watchId = navigator.geolocation.watchPosition(
-      onPosicao,
-      onErroGPS,
-      { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 }
-    );
-  }
+  document.getElementById('tank-fill').style.width = pct + '%';
+  document.getElementById('tank-fill').style.background = `linear-gradient(90deg,${hex}99,${hex})`;
+  document.getElementById('tank-card').style.borderColor = cor==='verde' ? '#322f37' : hex+'44';
+  document.getElementById('tank-pct').textContent = Math.round(pct) + '%';
+  document.getElementById('tank-pct').style.color = hex;
+  document.getElementById('tank-litros').innerHTML = `<strong>${L.toFixed(1)}</strong> litros restantes`;
+  document.getElementById('km-rest').textContent = Math.round(kmRest);
+  document.getElementById('km-rest').style.color = hex;
+  document.getElementById('consumo-val').textContent = cons.toFixed(1);
 
-  function pararViagem() {
-    if (!estado.viajando) return;
-    estado.viajando = false;
-    estado.posAnterior = null;
-    if (watchId !== null) {
-      navigator.geolocation.clearWatch(watchId);
-      watchId = null;
-    }
-    salvar();
-    atualizarBtnViagem();
-    mostrarToast('⏹ Viagem pausada — ' + estado.kmRodados.toFixed(1) + ' km rodados');
-  }
+  const badge = document.getElementById('status-badge');
+  badge.style.background = hex + '18';
+  badge.style.borderColor = hex + '44';
+  badge.style.color = hex;
+  document.getElementById('status-dot').style.background = hex;
+  document.getElementById('status-dot').style.animationDuration = cor==='vermelho' ? '0.5s' : '1.5s';
+  document.getElementById('status-text').textContent = status;
 
-  function onPosicao(pos) {
-    const lat = pos.coords.latitude;
-    const lon = pos.coords.longitude;
-    const acc = pos.coords.accuracy; // precisão em metros
+  document.getElementById('km-rodados').textContent = estado.kmRodados.toFixed(1) + ' km';
+}
 
-    // Ignora leituras imprecisas (mais de 50m de erro)
-    if (acc > 50) return;
+// ===== PLAYER DE MÚSICA =====
+const audio = new Audio();
+let playlist = [], musicaIdx = 0, tocando = false;
 
-    if (estado.posAnterior) {
-      const dist = calcularDistancia(
-        estado.posAnterior.lat, estado.posAnterior.lon, lat, lon
-      );
-      // Ignora movimentos menores que 10m (parado no sinal)
-      if (dist > 0.01) {
-        estado.litros = Math.max(0, estado.litros - (dist / consumoAtual()));
-        estado.kmRodados += dist;
-        salvar();
-        atualizar();
+function selecionarMusica() { document.getElementById('music-file-input').click(); }
 
-        // Alerta de reserva
-        if (estado.litros <= CELTA.reserva && estado.litros > 0) {
-          mostrarAlerta();
+function carregarMusicas(e) {
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
+  playlist = files.map(f => ({
+    nome: f.name.replace(/\.[^.]+$/, ''),
+    artista: '—', capa: null, url: URL.createObjectURL(f), file: f
+  }));
+  musicaIdx = 0;
+  lerMeta(0);
+  toast('🎵 ' + playlist.length + ' música(s) carregada(s)!');
+}
+
+async function lerMeta(idx) {
+  const faixa = playlist[idx];
+  try {
+    const buf = await faixa.file.arrayBuffer();
+    const b = new Uint8Array(buf);
+    if (b[0]===0x49 && b[1]===0x44 && b[2]===0x33) {
+      const size = ((b[6]&0x7F)<<21)|((b[7]&0x7F)<<14)|((b[8]&0x7F)<<7)|(b[9]&0x7F);
+      let p = 10; const end = Math.min(p+size, b.length);
+      while (p < end-10) {
+        const id = String.fromCharCode(b[p],b[p+1],b[p+2],b[p+3]);
+        const fs = (b[p+4]<<24)|(b[p+5]<<16)|(b[p+6]<<8)|b[p+7];
+        p += 10;
+        if (fs<=0 || p+fs>end) break;
+        const fd = b.slice(p, p+fs);
+        if (id==='TIT2' && !faixa._titulo) faixa.nome = decodeStr(fd) || faixa.nome;
+        if (id==='TPE1') faixa.artista = decodeStr(fd) || '—';
+        if (id==='APIC' && !faixa.capa) {
+          let i=1; while(i<fd.length && fd[i]!==0) i++; i++; i++;
+          while(i<fd.length && fd[i]!==0) i++; i++;
+          if (i<fd.length) faixa.capa = URL.createObjectURL(new Blob([fd.slice(i)]));
         }
-        // Reseta alerta se abastecer
-        if (estado.litros > CELTA.reserva) {
-          estado.alertaMostrado = false;
-        }
+        p += fs;
       }
     }
-    estado.posAnterior = { lat, lon };
+  } catch(e){}
+  carregarFaixa(idx);
+}
+
+function decodeStr(d) {
+  try {
+    const enc=d[0], str=d.slice(1);
+    return new TextDecoder(enc===1||enc===2?'utf-16':'utf-8').decode(str).replace(/\x00/g,'').trim();
+  } catch(e){ return null; }
+}
+
+function carregarFaixa(idx) {
+  const f = playlist[idx];
+  audio.src = f.url; audio.load();
+
+  // Nome e artista
+  const tn = document.getElementById('track-name');
+  tn.textContent = f.nome; tn.classList.remove('idle');
+  document.getElementById('track-artist').textContent = f.artista;
+
+  // CAPA — usa background-image que sempre preenche o quadrado todo
+  const art = document.getElementById('album-art');
+  if (f.capa) {
+    art.style.backgroundImage = 'url(' + f.capa + ')';
+    art.style.backgroundSize = 'cover';
+    art.style.backgroundPosition = 'center';
+    art.textContent = '';
+  } else {
+    art.style.backgroundImage = 'none';
+    art.textContent = '🎵';
   }
 
-  function onErroGPS(err) {
-    let msg = 'Erro no GPS';
-    if (err.code === 1) msg = 'Permita o acesso ao GPS nas configurações';
-    if (err.code === 2) msg = 'GPS indisponível — tente ao ar livre';
-    if (err.code === 3) msg = 'GPS demorou — tente de novo';
-    mostrarToast('⚠️ ' + msg, '#FFB400');
-    estado.viajando = false;
-    atualizarBtnViagem();
-  }
+  if (tocando) audio.play().catch(()=>{});
+}
 
-  function calcularDistancia(lat1, lon1, lat2, lon2) {
-    // Fórmula de Haversine — retorna km
-    const R = 6371;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) *
-              Math.sin(dLon/2) * Math.sin(dLon/2);
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  }
+function toggleMusica() {
+  if (!playlist.length) { selecionarMusica(); return; }
+  if (tocando) audio.pause();
+  else audio.play().catch(()=>{});
+}
 
-  function consumoAtual() {
-    return CELTA.consumo[estado.combustivel].cidade;
-  }
+function proximaMusica() {
+  if (!playlist.length) return;
+  musicaIdx = (musicaIdx + 1) % playlist.length;
+  lerMeta(musicaIdx);
+  if (tocando) audio.play().catch(()=>{});
+}
 
-  function atualizarBtnViagem() {
-    const btn = document.getElementById('btn-viagem');
-    if (!btn) return;
-    if (estado.viajando) {
-      btn.textContent = '⏹ Parar GPS';
-      btn.style.background = '#FF5544';
-      btn.style.boxShadow = '0 8px 24px rgba(255,85,68,0.35)';
-    } else {
-      btn.textContent = '🚗 Iniciar viagem';
-      btn.style.background = '#BF7FFF';
-      btn.style.boxShadow = '0 8px 24px rgba(191,127,255,0.35)';
-    }
-  }
+function musicaAnterior() {
+  if (!playlist.length) return;
+  if (audio.currentTime > 3) { audio.currentTime = 0; return; }
+  musicaIdx = (musicaIdx - 1 + playlist.length) % playlist.length;
+  lerMeta(musicaIdx);
+  if (tocando) audio.play().catch(()=>{});
+}
 
-  // ---- COMBUSTÍVEL ----
-  function setFuel(tipo) {
-    estado.combustivel = tipo;
-    document.getElementById('btn-gas').className = 'fuel-btn' + (tipo === 'gas' ? ' active-gas' : '');
-    document.getElementById('btn-alc').className = 'fuel-btn' + (tipo === 'alc' ? ' active-alc' : '');
-    salvar();
-    atualizar();
-  }
+function seekMusica(e) {
+  if (!audio.duration) return;
+  const bar = document.getElementById('progress-bar');
+  const rect = bar.getBoundingClientRect();
+  audio.currentTime = Math.max(0, Math.min(1, (e.clientX-rect.left)/rect.width)) * audio.duration;
+}
 
-  // ---- AJUSTE MANUAL DO TANQUE ----
-  function testarNivel(valor) {
-    estado.litros = parseFloat(valor);
-    const el = document.getElementById('slider-val');
-    if (el) el.textContent = parseFloat(valor).toFixed(1) + ' litros';
-    // Reseta alerta se ajustou pra cima da reserva
-    if (estado.litros > CELTA.reserva) estado.alertaMostrado = false;
-    salvar();
-    atualizar();
-  }
+audio.addEventListener('timeupdate', () => {
+  if (!audio.duration) return;
+  const pct = audio.currentTime / audio.duration * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('cur-time').textContent = fmtTempo(audio.currentTime);
+});
+audio.addEventListener('loadedmetadata', () => {
+  document.getElementById('dur-time').textContent = fmtTempo(audio.duration);
+});
+audio.addEventListener('play', () => {
+  tocando = true;
+  document.getElementById('play-btn').textContent = '⏸';
+});
+audio.addEventListener('pause', () => {
+  tocando = false;
+  document.getElementById('play-btn').textContent = '▶';
+});
+audio.addEventListener('ended', proximaMusica);
 
-  // ---- ATUALIZAR TELA ----
-  function atualizar() {
-    const L = estado.litros;
-    const pct = Math.max(0, Math.min(100, (L / CELTA.tanque) * 100));
-    const cons = CELTA.consumo[estado.combustivel].cidade;
-    const kmRest = Math.max(0, L * cons);
+// ===== FULLSCREEN =====
+document.addEventListener('touchstart', function h() {
+  try { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); } catch(e){}
+  document.removeEventListener('touchstart', h);
+}, { once: true });
 
-    // Determina cor
-    let cor, corHex, status, glow;
-    if (L > CELTA.metade) {
-      cor = 'verde';
-      corHex = '#2BD68F';
-      glow = 'rgba(43,214,143,0.15)';
-      status = 'Tanque cheio — bora dirigir! 🚗';
-    } else if (L > CELTA.reserva) {
-      cor = 'amarelo';
-      corHex = '#FFB400';
-      glow = 'rgba(255,180,0,0.15)';
-      status = 'Atenção — vá abastecer em breve ⚠️';
-    } else {
-      cor = 'vermelho';
-      corHex = '#FF5544';
-      glow = 'rgba(255,85,68,0.2)';
-      status = 'RESERVA! Procure um posto agora! 🚨';
-    }
-
-    // Atualiza barra
-    const fill = document.getElementById('tank-fill');
-    fill.style.width = pct + '%';
-    fill.style.background = `linear-gradient(90deg, ${corHex}99, ${corHex})`;
-
-    // Atualiza card
-    const card = document.getElementById('tank-card');
-    card.className = 'tank-card ' + cor;
-    card.style.setProperty('--glow-color', glow);
-    card.style.borderColor = cor === 'verde' ? '#322f37' : corHex + '44';
-
-    // Atualiza textos
-    document.getElementById('tank-pct').textContent = Math.round(pct) + '%';
-    document.getElementById('tank-pct').style.color = corHex;
-    document.getElementById('tank-litros').innerHTML = `<strong>${L.toFixed(1)}</strong> litros restantes`;
-    document.getElementById('km-rest').textContent = Math.round(kmRest);
-    document.getElementById('km-rest').style.color = corHex;
-    document.getElementById('consumo-val').textContent = cons.toFixed(1);
-
-    // Atualiza status badge
-    const badge = document.getElementById('status-badge');
-    badge.style.background = corHex + '18';
-    badge.style.border = `1px solid ${corHex}44`;
-    badge.style.color = corHex;
-    document.getElementById('status-dot').style.background = corHex;
-    document.getElementById('status-text').textContent = status;
-
-    // Pisca se vermelho
-    document.getElementById('status-dot').style.animationDuration =
-      cor === 'vermelho' ? '0.5s' : '1.5s';
-
-    // Atualiza km rodados
-    const kmRodEl = document.getElementById('km-rodados-val');
-    if (kmRodEl) kmRodEl.textContent = estado.kmRodados.toFixed(1) + ' km';
-
-    // Atualiza status GPS
-    const gpsDot = document.getElementById('gps-dot');
-    const gpsStatus = document.getElementById('gps-status');
-    if (gpsDot && gpsStatus) {
-      if (estado.viajando) {
-        gpsDot.style.background = '#2BD68F';
-        gpsDot.style.boxShadow = '0 0 6px #2BD68F';
-        gpsDot.style.animation = 'blink 1s ease-in-out infinite';
-        gpsStatus.innerHTML = '<div id="gps-dot" style="width:8px;height:8px;border-radius:50%;background:#2BD68F;box-shadow:0 0 6px #2BD68F;margin:0 auto 4px;animation:blink 1s ease-in-out infinite;"></div>GPS on';
-        gpsStatus.style.color = '#2BD68F';
-      } else {
-        gpsStatus.innerHTML = '<div id="gps-dot" style="width:8px;height:8px;border-radius:50%;background:#6B6870;margin:0 auto 4px;"></div>GPS off';
-        gpsStatus.style.color = '#6B6870';
-      }
-    }
-  }
-
-  // ---- SALVAR E CARREGAR ----
-  function salvar() {
-    try { localStorage.setItem('celta_estado', JSON.stringify(estado)); } catch(e) {}
-  }
-
-  function carregar() {
-    try {
-      const salvo = localStorage.getItem('celta_estado');
-      if (salvo) {
-        const d = JSON.parse(salvo);
-        estado.litros      = d.litros      ?? 48;
-        estado.combustivel = d.combustivel ?? 'gas';
-        estado.kmRodados   = d.kmRodados   ?? 0;
-        estado.ultimoAbast = d.ultimoAbast ?? null;
-        // viajando sempre começa false — GPS precisa ser reativado manualmente
-        estado.viajando    = false;
-      }
-    } catch(e) {}
-  }
-
-  // ---- TOAST ----
-  function mostrarToast(msg, cor) {
-    cor = cor || '#2BD68F';
-    let t = document.getElementById('toast-msg');
-    if (!t) {
-      t = document.createElement('div');
-      t.id = 'toast-msg';
-      t.style.cssText = 'position:fixed;bottom:110px;left:50%;transform:translateX(-50%);' +
-        'padding:12px 24px;border-radius:20px;font-size:14px;font-weight:600;' +
-        'z-index:999;opacity:0;transition:opacity 0.3s ease;white-space:nowrap;' +
-        'box-shadow:0 4px 20px rgba(0,0,0,0.3);';
-      document.body.appendChild(t);
-    }
-    t.textContent = msg;
-    t.style.background = cor;
-    t.style.color = (cor === '#FF5544') ? '#fff' : '#0f0f13';
-    t.style.opacity = '1';
-    clearTimeout(t._timer);
-    t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2500);
-  }
-
-  // ---- TANQUE CHEIO (com salvamento) ----
-  function tanqueCheio() {
-    const agora = new Date();
-    const dataHora = agora.toLocaleDateString('pt-BR') + ' às ' +
-                     agora.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
-    estado.litros      = CELTA.tanque;
-    estado.kmRodados   = 0;
-    estado.ultimoAbast = dataHora;
-    salvar();
-    document.getElementById('slider').value = CELTA.tanque;
-    document.getElementById('slider-val').textContent = CELTA.tanque + ' litros';
-    atualizarInfoAbast();
-    atualizar();
-    if (navigator.vibrate) navigator.vibrate([100,50,100]);
-    mostrarToast('⛽ Tanque cheio registrado!');
-  }
-
-  // ---- TOGGLE VIAGEM ----
-  function toggleViagem() {
-    if (estado.viajando) pararViagem();
-    else iniciarViagem();
-  }
-
-  // ---- INFO ABASTECIMENTO ----
-  function atualizarInfoAbast() {
-    const el = document.getElementById('ultimo-abast');
-    if (el) {
-      el.textContent = estado.ultimoAbast
-        ? '🕐 Último abastecimento: ' + estado.ultimoAbast
-        : 'Nenhum abastecimento registrado ainda';
-    }
-  }
-
-  // ---- PLAYER DE MÚSICA ----
-  let audio = new Audio();
-  let playlist = [];
-  let musicaAtual = 0;
-  let tocando = false;
-
-  function selecionarMusica() {
-    document.getElementById('music-file-input').click();
-  }
-
-  function carregarMusicas(event) {
-    const files = Array.from(event.target.files);
-    if (!files.length) return;
-
-    playlist = files.map(f => ({
-      nome: f.name.replace(/\.[^.]+$/, ''),
-      artista: 'Desconhecido',
-      capa: null,
-      url: URL.createObjectURL(f),
-      file: f
-    }));
-
-    musicaAtual = 0;
-    lerMetadados(0);
-    mostrarToast('🎵 ' + playlist.length + ' música(s) carregada(s)!');
-  }
-
-  // Lê metadados ID3 básicos (título, artista, capa)
-  async function lerMetadados(index) {
-    const faixa = playlist[index];
-    if (!faixa) return;
-
-    try {
-      const buf = await faixa.file.arrayBuffer();
-      const bytes = new Uint8Array(buf);
-
-      // Verifica se tem tag ID3v2
-      if (bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] === 0x33) {
-        const tags = parseID3v2(bytes);
-        if (tags.titulo) faixa.nome    = tags.titulo;
-        if (tags.artista) faixa.artista = tags.artista;
-        if (tags.capa)    faixa.capa    = tags.capa;
-      }
-    } catch(e) {}
-
-    carregarFaixa(index);
-  }
-
-  function parseID3v2(bytes) {
-    const result = { titulo: null, artista: null, capa: null };
-    try {
-      // Tamanho do header ID3
-      const size = ((bytes[6] & 0x7F) << 21) | ((bytes[7] & 0x7F) << 14) |
-                   ((bytes[8] & 0x7F) << 7)  |  (bytes[9] & 0x7F);
-      let pos = 10;
-      const end = Math.min(pos + size, bytes.length);
-
-      while (pos < end - 10) {
-        const frameId = String.fromCharCode(bytes[pos], bytes[pos+1], bytes[pos+2], bytes[pos+3]);
-        const frameSize = (bytes[pos+4] << 24) | (bytes[pos+5] << 16) | (bytes[pos+6] << 8) | bytes[pos+7];
-        pos += 10;
-        if (frameSize <= 0 || pos + frameSize > end) break;
-
-        const frameData = bytes.slice(pos, pos + frameSize);
-
-        if (frameId === 'TIT2' && !result.titulo) {
-          result.titulo = decodeID3String(frameData);
-        } else if (frameId === 'TPE1' && !result.artista) {
-          result.artista = decodeID3String(frameData);
-        } else if (frameId === 'APIC' && !result.capa) {
-          // Pula encoding, mime type e description pra chegar nos bytes da imagem
-          let i = 1;
-          while (i < frameData.length && frameData[i] !== 0) i++;
-          i++; // pula null após mime
-          i++; // pula picture type
-          while (i < frameData.length && frameData[i] !== 0) i++;
-          i++; // pula null após description
-          if (i < frameData.length) {
-            const imgBytes = frameData.slice(i);
-            const blob = new Blob([imgBytes]);
-            result.capa = URL.createObjectURL(blob);
-          }
-        }
-        pos += frameSize;
-      }
-    } catch(e) {}
-    return result;
-  }
-
-  function decodeID3String(data) {
-    try {
-      const enc = data[0];
-      const str = data.slice(1);
-      if (enc === 1 || enc === 2) {
-        return new TextDecoder('utf-16').decode(str).replace(/\x00/g, '').trim();
-      }
-      return new TextDecoder('utf-8').decode(str).replace(/\x00/g, '').trim();
-    } catch(e) { return null; }
-  }
-
-  function carregarFaixa(index) {
-    if (!playlist.length) return;
-    const faixa = playlist[index];
-    audio.src = faixa.url;
-    audio.load();
-
-    // Atualiza nome no player de baixo
-    const nameEl = document.getElementById('music-name');
-    if (nameEl) { nameEl.textContent = faixa.nome; nameEl.classList.remove('idle'); }
-
-    // Atualiza nome no header
-    const hName = document.getElementById('header-music-name');
-    if (hName) { hName.textContent = faixa.nome; hName.classList.remove('idle'); }
-
-    // Atualiza artista no header
-    const hArtist = document.getElementById('header-artist-name');
-    if (hArtist) hArtist.textContent = faixa.artista || 'Artista desconhecido';
-
-    // Atualiza capa no quadrado — imagem inteira sem cortar
-    const coverbg = document.getElementById('album-cover-bg');
-    if (coverbg) {
-      if (faixa.capa) {
-        coverbg.innerHTML = '<img src="' + faixa.capa + '" style="' +
-          'width:100%;height:100%;object-fit:contain;' +
-          'background:#25232a;display:block;">';
-      } else {
-        coverbg.innerHTML = '🎵';
-      }
-    }
-
-    if (tocando) audio.play().catch(() => {});
-  }
-
-  function toggleMusica() {
-    if (!playlist.length) {
-      selecionarMusica(); return;
-    }
-    if (tocando) {
-      audio.pause();
-      tocando = false;
-      document.getElementById('music-play-btn').textContent = '▶';
-    } else {
-      audio.play().then(() => {
-        tocando = true;
-        document.getElementById('music-play-btn').textContent = '⏸';
-      }).catch(() => {
-        mostrarToast('Erro ao tocar — tente de novo', '#FF5544');
-      });
-    }
-  }
-
-  function proximaMusica() {
-    if (!playlist.length) return;
-    musicaAtual = (musicaAtual + 1) % playlist.length;
-    carregarFaixa(musicaAtual);
-    if (tocando) audio.play().catch(() => {});
-  }
-
-  function musicaAnterior() {
-    if (!playlist.length) return;
-    // Se passou mais de 3s volta pro início, senão vai pra anterior
-    if (audio.currentTime > 3) {
-      audio.currentTime = 0; return;
-    }
-    musicaAtual = (musicaAtual - 1 + playlist.length) % playlist.length;
-    carregarFaixa(musicaAtual);
-    if (tocando) audio.play().catch(() => {});
-  }
-
-  function seekMusica(event) {
-    if (!audio.duration) return;
-    const bar = document.getElementById('music-progress-bar');
-    const rect = bar.getBoundingClientRect();
-    const pct = (event.clientX - rect.left) / rect.width;
-    audio.currentTime = pct * audio.duration;
-  }
-
-  function formatarTempo(s) {
-    if (!isFinite(s) || s < 0) return '0:00';
-    const m = Math.floor(s / 60);
-    const sec = Math.floor(s % 60);
-    return m + ':' + String(sec).padStart(2, '0');
-  }
-
-  // Eventos do audio
-  audio.addEventListener('timeupdate', () => {
-    if (!audio.duration) return;
-    const pct = (audio.currentTime / audio.duration) * 100;
-
-    // Player de baixo
-    const fill = document.getElementById('music-progress-fill');
-    const cur  = document.getElementById('music-cur-time');
-    if (fill) fill.style.width = pct + '%';
-    if (cur)  cur.textContent  = formatarTempo(audio.currentTime);
-
-    // Header
-    const hFill = document.getElementById('header-progress-fill');
-    const hCur  = document.getElementById('header-cur-time');
-    if (hFill) hFill.style.width = pct + '%';
-    if (hCur)  hCur.textContent  = formatarTempo(audio.currentTime);
-  });
-
-  audio.addEventListener('loadedmetadata', () => {
-    const dur  = document.getElementById('music-dur-time');
-    const hDur = document.getElementById('header-dur-time');
-    if (dur)  dur.textContent  = formatarTempo(audio.duration);
-    if (hDur) hDur.textContent = formatarTempo(audio.duration);
-  });
-
-  audio.addEventListener('ended', () => {
-    proximaMusica();
-  });
-
-  audio.addEventListener('play',  () => {
-    tocando = true;
-    const pb = document.getElementById('music-play-btn');
-    const hb = document.getElementById('header-play-btn');
-    if (pb) pb.textContent = '⏸';
-    if (hb) hb.textContent = '⏸';
-  });
-
-  audio.addEventListener('pause', () => {
-    tocando = false;
-    const pb = document.getElementById('music-play-btn');
-    const hb = document.getElementById('header-play-btn');
-    if (pb) pb.textContent = '▶';
-    if (hb) hb.textContent = '▶';
-  });
-
-  // ---- FULLSCREEN ----
-  function entrarTelaCheia() {
-    const el = document.documentElement;
-    try {
-      if (el.requestFullscreen)             el.requestFullscreen();
-      else if (el.webkitRequestFullscreen)  el.webkitRequestFullscreen();
-      else if (el.mozRequestFullScreen)     el.mozRequestFullScreen();
-      else if (el.msRequestFullscreen)      el.msRequestFullscreen();
-    } catch(e) {}
-  }
-
-  // Entra em tela cheia automaticamente no primeiro toque
-  document.addEventListener('touchstart', function handler() {
-    entrarTelaCheia();
-    document.removeEventListener('touchstart', handler);
-  }, { once: true });
-
-  // ---- INIT ----
-  carregar();
-  document.getElementById('slider').value = estado.litros;
-  const sliderValEl = document.getElementById('slider-val');
-  if (sliderValEl) sliderValEl.textContent = parseFloat(estado.litros).toFixed(1) + ' litros';
-  document.getElementById('btn-gas').className = 'fuel-btn' + (estado.combustivel === 'gas' ? ' active-gas' : '');
-  document.getElementById('btn-alc').className  = 'fuel-btn' + (estado.combustivel === 'alc' ? ' active-alc' : '');
-  atualizarInfoAbast();
-  atualizar();
-  pedirPermissaoNotificacao();
+// ===== INIT =====
+carregar();
+document.getElementById('slider').value = estado.litros;
+document.getElementById('slider-val').textContent = estado.litros.toFixed(1) + ' litros';
+document.getElementById('btn-gas').className = 'fuel-btn' + (estado.combustivel==='gas' ? ' active-gas' : '');
+document.getElementById('btn-alc').className  = 'fuel-btn' + (estado.combustivel==='alc' ? ' active-alc' : '');
+atualizarAbast(); atualizarBtnViagem(); atualizar();
+if ('Notification' in window && Notification.permission==='default') Notification.requestPermission();
 </script>
 </body>
 </html>
