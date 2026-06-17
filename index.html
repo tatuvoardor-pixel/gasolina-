@@ -81,18 +81,17 @@
 
   /* Capa do álbum no header */
   .album-cover {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
     background: #25232a;
     border: 1px solid #322f37;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 24px;
     overflow: hidden;
     flex-shrink: 0;
-    margin: 0 auto 4px;
     transition: all 0.3s ease;
   }
 
@@ -100,18 +99,12 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 9px;
+    display: block;
   }
 
   .album-cover.playing {
     border-color: #BF7FFF;
     box-shadow: 0 0 16px rgba(191,127,255,0.3);
-    animation: rodar 8s linear infinite;
-  }
-
-  @keyframes rodar {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
   }
 
   .music-info-center {
@@ -123,30 +116,28 @@
   }
 
   .music-track-name {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     color: #F5F2EE;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 150px;
-    margin: 0 auto 1px;
+    margin: 0 0 2px;
   }
 
   .music-track-name.idle {
     color: #6B6870;
     font-weight: 400;
-    font-size: 11px;
+    font-size: 12px;
   }
 
   .music-artist-name {
-    font-size: 10px;
+    font-size: 11px;
     color: #6B6870;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 150px;
-    margin: 0 auto 4px;
+    margin: 0;
   }
 
   /* Mini barra de progresso no header */
@@ -731,28 +722,42 @@
       </div>
     </div>
 
-    <!-- Linha 2: Player de música compacto -->
-    <div style="display:flex;align-items:center;gap:10px;
-      background:#1c1a1f;border:1px solid #322f37;border-radius:16px;padding:10px 14px;">
+    <!-- Linha 2: Player de música -->
+    <div style="background:#1c1a1f;border:1px solid #322f37;border-radius:16px;padding:12px 14px;">
 
-      <!-- Capa -->
-      <div class="album-cover" id="album-cover" style="margin:0;flex-shrink:0;">🎵</div>
+      <!-- Linha A: capa + nome + artista -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
 
-      <!-- Info + progresso -->
-      <div style="flex:1;min-width:0;">
-        <div class="music-track-name idle" id="header-music-name" style="margin:0 0 1px;">Selecione uma música</div>
-        <div class="music-artist-name" id="header-artist-name" style="margin:0 0 5px;">—</div>
+        <!-- Capa quadrada preenchida -->
+        <div class="album-cover" id="album-cover" style="margin:0;flex-shrink:0;">🎵</div>
+
+        <!-- Nome e artista -->
+        <div style="flex:1;min-width:0;">
+          <div class="music-track-name idle" id="header-music-name">Selecione uma música</div>
+          <div class="music-artist-name" id="header-artist-name">—</div>
+        </div>
+
+        <!-- Botão abrir arquivo -->
+        <button onclick="selecionarMusica()" style="
+          background:#25232a;border:1px solid #322f37;border-radius:10px;
+          color:#9B98A0;font-size:11px;padding:6px 10px;cursor:pointer;
+          flex-shrink:0;white-space:nowrap;">📂</button>
+      </div>
+
+      <!-- Linha B: barra de progresso + tempo -->
+      <div style="margin-bottom:10px;">
         <div class="header-progress-bar" onclick="seekMusica(event)" id="header-progress-bar">
           <div class="header-progress-fill" id="header-progress-fill"></div>
         </div>
-        <div class="header-time-row">
+        <div style="display:flex;justify-content:space-between;
+          font-size:10px;color:#6B6870;font-family:monospace;margin-top:4px;">
           <span id="header-cur-time">0:00</span>
           <span id="header-dur-time">0:00</span>
         </div>
       </div>
 
-      <!-- Controles ⏮ ▶ ⏭ -->
-      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+      <!-- Linha C: controles centralizados -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:12px;">
         <button class="music-ctrl-btn" onclick="musicaAnterior()">⏮</button>
         <button class="music-ctrl-btn play-main" id="header-play-btn" onclick="toggleMusica()">▶</button>
         <button class="music-ctrl-btn" onclick="proximaMusica()">⏭</button>
